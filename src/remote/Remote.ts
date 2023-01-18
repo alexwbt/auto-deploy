@@ -1,40 +1,16 @@
-import fs from "fs";
 import { Client } from "ssh2";
 
-export type RemoteConfig = {
-  port: number;
-  host: string;
-  username: string;
-  privateKey: string;
-  timeout?: number;
+export type RemoteExecConfig = {
+  onData?: (data: Buffer) => void;
+  onErrorData?: (data: Buffer) => void;
+  stdout?: (data: string) => void;
+  stderr?: (data: string) => void;
 };
 
-export const createRemote = async ({
-  port,
-  host,
-  username,
-  privateKey,
-  timeout,
-}: RemoteConfig) => {
-  const _timeout = Number(timeout) > 0 ? timeout : 10000;
-  const client = new Client();
-  const clientPromise = new Promise<void>((res, rej) => {
-    client.on("ready", res);
-    client.on("error", rej);
-    setTimeout(rej, _timeout);
-  });
-
-  const privateKeyData = await fs.promises.readFile(privateKey);
-  client.connect({
-    port,
-    host,
-    username,
-    privateKey: privateKeyData,
-    timeout: _timeout,
-  });
-
-  await clientPromise;
-  return new Remote(client);
+export type RemoteExecResult = {
+  code: number;
+  stdout: string;
+  stderr: string;
 };
 
 export default class Remote {
@@ -47,15 +23,30 @@ export default class Remote {
     this.sshClient.end();
   }
 
-  public uptime() {
-    return new Promise<string>((res, rej) => {
-      this.sshClient.exec("uptime", (err, stream) => {
+  public exec(command: string, {
+    stdout, stderr, onData, onErrorData
+  }: RemoteExecConfig = {}) {
+    return new Promise<RemoteExecResult>((res, rej) => {
+      let stdoutStr = "";
+      let stderrStr = "";
+      this.sshClient.exec(command, (err, stream) => {
         if (err) {
           rej(err);
           return;
         }
-        stream.on("data", (data: Buffer) => res(`${data}`));
-        stream.stderr.on("data", (data: Buffer) => rej(`${data}`));
+        stream.on("close", (code: number) => {
+          res({ code, stdout: stdoutStr, stderr: stderrStr });
+        });
+        stream.on("data", (data: Buffer) => {
+          onData && onData(data);
+          stdout && stdout(`${data}`);
+          stdoutStr += `${data}`;
+        });
+        stream.stderr.on("data", (data: Buffer) => {
+          onErrorData && onErrorData(data);
+          stderr && stderr(`${data}`)
+          stderrStr += `${data}`;
+        });
       });
     });
   }

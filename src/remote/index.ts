@@ -1,5 +1,6 @@
 import { getEnvNumber, getEnvStringRequired } from "../utils/env";
-import { createRemote, RemoteConfig } from "./Remote";
+import { createRemote, RemoteConfig } from "./createRemote";
+import RemoteManager from "./RemoteManager";
 
 const remoteConfig: RemoteConfig = {
   port: getEnvNumber("REMOTE_PORT", 22),
@@ -8,4 +9,5 @@ const remoteConfig: RemoteConfig = {
   privateKey: getEnvStringRequired("REMOTE_PRIVATE_KEY"),
 };
 
-export const getRemote = () => createRemote(remoteConfig);
+export const getRemote = async () =>
+  new RemoteManager(await createRemote(remoteConfig));
