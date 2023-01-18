@@ -1,4 +1,7 @@
 import { Client } from "ssh2";
+import tar from "tar";
+import fs from "fs";
+import util from "util";
 
 export type RemoteExecConfig = {
   onData?: (data: Buffer) => void;
@@ -49,6 +52,41 @@ export default class RemoteClient {
         });
       });
     });
+  }
+
+  public async upload(dest: string, ...src: string[]) {
+    const file = "upload_tmp.tar";
+
+    // tar
+    await tar.create({ file }, src);
+
+    // upload
+    const uploadError = await new Promise<Error | undefined>(res => {
+      // sftp
+      this.client.sftp((err, sftp) => {
+        if (err) {
+          res(err);
+          return;
+        }
+        // fastPut
+        sftp.fastPut(file, file, err => {
+          if (err) {
+            res(err);
+            return;
+          }
+          res(undefined);
+        });
+      })
+    });
+
+    // rm tmp file
+    await util.promisify(fs.rm)(file);
+
+    // throw upload error
+    if (uploadError) throw uploadError;
+
+    // move remove tmp to destination
+    return await this.exec(`mkdir -p ${dest} && tar -xvf ${file} --directory ${dest} && rm ${file}`);
   }
 
 }
