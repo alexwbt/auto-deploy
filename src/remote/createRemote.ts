@@ -1,6 +1,7 @@
 import fs from "fs";
 import { Client } from "ssh2";
 import Remote from "./Remote";
+import RemoteClient from "./RemoteClient";
 
 export type RemoteConfig = {
   port: number;
@@ -10,7 +11,7 @@ export type RemoteConfig = {
   timeout?: number;
 };
 
-export const createRemote = async ({
+const createRemote = async ({
   port,
   host,
   username,
@@ -35,5 +36,7 @@ export const createRemote = async ({
   });
 
   await clientPromise;
-  return new Remote(client);
+  return new Remote(new RemoteClient(client));
 };
+
+export default createRemote;

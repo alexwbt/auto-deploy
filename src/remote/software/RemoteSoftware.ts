@@ -1,9 +1,9 @@
-import Remote from "../Remote";
+import RemoteClient from "../RemoteClient";
 
 export default class RemoteSoftware {
 
-  constructor(
-    protected readonly remote: Remote,
-  ) { }
+    constructor(
+        protected readonly client: RemoteClient,
+    ) { }
 
 }

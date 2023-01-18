@@ -1,8 +1,9 @@
-import { getRemote } from "./remote";
+import createRemote from "./remote/createRemote";
+import createRemoteConfig from "./remote/createRemoteConfig";
 
 (async () => {
   console.log("connecting...");
-  const remote = await getRemote();
+  const remote = await createRemote(createRemoteConfig);
   console.log("connected");
 
   const gitVersion = await remote.git.version();
@@ -12,6 +13,6 @@ import { getRemote } from "./remote";
   }
 
   console.log("terminating...");
-  remote.end();
+  remote.client.end();
   console.log("terminated");
 })();

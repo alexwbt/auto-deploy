@@ -1,54 +1,18 @@
-import { Client } from "ssh2";
-
-export type RemoteExecConfig = {
-  onData?: (data: Buffer) => void;
-  onErrorData?: (data: Buffer) => void;
-  stdout?: (data: string) => void;
-  stderr?: (data: string) => void;
-};
-
-export type RemoteExecResult = {
-  code: number;
-  stdout: string;
-  stderr: string;
-};
+import RemoteClient from "./RemoteClient";
+import RemotePM from "./software/pm/RemotePM";
+import RemoteYum from "./software/pm/RemoteYum";
+import RemoteGit from "./software/RemoteGit";
 
 export default class Remote {
 
+  public readonly pm: RemotePM;
+  public readonly git: RemoteGit;
+
   constructor(
-    private sshClient: Client,
-  ) { }
-
-  public end() {
-    this.sshClient.end();
-  }
-
-  public exec(command: string, {
-    stdout, stderr, onData, onErrorData
-  }: RemoteExecConfig = {}) {
-    return new Promise<RemoteExecResult>((res, rej) => {
-      let stdoutStr = "";
-      let stderrStr = "";
-      this.sshClient.exec(command, (err, stream) => {
-        if (err) {
-          rej(err);
-          return;
-        }
-        stream.on("close", (code: number) => {
-          res({ code, stdout: stdoutStr, stderr: stderrStr });
-        });
-        stream.on("data", (data: Buffer) => {
-          onData && onData(data);
-          stdout && stdout(`${data}`);
-          stdoutStr += `${data}`;
-        });
-        stream.stderr.on("data", (data: Buffer) => {
-          onErrorData && onErrorData(data);
-          stderr && stderr(`${data}`)
-          stderrStr += `${data}`;
-        });
-      });
-    });
+    public readonly client: RemoteClient
+  ) {
+    this.pm = new RemoteYum(client);
+    this.git = new RemoteGit(client);
   }
 
 }

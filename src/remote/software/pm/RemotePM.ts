@@ -1,4 +1,4 @@
-import RemoteSoftware from "../software/RemoteSoftware";
+import RemoteSoftware from "../RemoteSoftware";
 
 export default abstract class RemotePM extends RemoteSoftware {
 
