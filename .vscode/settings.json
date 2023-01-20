@@ -2,5 +2,6 @@
   "cSpell.words": [
     "certbot",
     "letsencrypt"
-  ]
+  ],
+  "editor.tabSize": 2
 }

@@ -1,5 +1,6 @@
 import createRemote from "./remote/createRemote";
 import createRemoteConfig from "./remote/createRemoteConfig";
+import syncPackage from "./syncPackage";
 
 (async () => {
   console.log("connecting...");
@@ -12,7 +13,7 @@ import createRemoteConfig from "./remote/createRemoteConfig";
   //   await remote.pm.installGit();
   // }
 
-  console.log(await remote.client.upload("~/test", "configuration"));
+  await syncPackage(remote);
 
   console.log("terminating...");
   remote.client.end();
