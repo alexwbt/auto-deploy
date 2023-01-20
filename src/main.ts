@@ -1,21 +1,8 @@
-import createRemote from "./remote/createRemote";
-import createRemoteConfig from "./remote/createRemoteConfig";
-import syncPackage from "./syncPackage";
+import initialize from "./functions/initialize";
+import syncPackage from "./functions/syncPackage";
+import remoteSession from "./remote/remoteSession";
 
-(async () => {
-  console.log("connecting...");
-  const remote = await createRemote(createRemoteConfig);
-  console.log("connected");
-
-  // const gitVersion = await remote.git.version();
-  // console.log(gitVersion);
-  // if (!gitVersion) {
-  //   await remote.pm.installGit();
-  // }
-
-  await syncPackage(remote);
-
-  console.log("terminating...");
-  remote.client.end();
-  console.log("terminated");
-})();
+remoteSession(async remote => {
+  await initialize(remote);
+  await syncPackage(remote, { envName: "uat" });
+});

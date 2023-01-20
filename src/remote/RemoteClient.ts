@@ -4,13 +4,14 @@ import fs from "fs";
 import util from "util";
 
 export type RemoteExecConfig = {
-  onData?: (data: Buffer) => void;
-  onErrorData?: (data: Buffer) => void;
-  stdout?: (data: string) => void;
-  stderr?: (data: string) => void;
+  on_stdout?: (data: string) => void;
+  on_stderr?: (data: string) => void;
+  on_data?: (data: Buffer) => void;
+  on_error_data?: (data: Buffer) => void;
 };
 
 export type RemoteExecResult = {
+  command: string;
   code: number;
   stdout: string;
   stderr: string;
@@ -27,28 +28,30 @@ export default class RemoteClient {
   }
 
   public exec(command: string, {
-    stdout, stderr, onData, onErrorData
+    on_stdout, on_stderr, on_data, on_error_data
   }: RemoteExecConfig = {}) {
     return new Promise<RemoteExecResult>((res, rej) => {
-      let stdoutStr = "";
-      let stderrStr = "";
+      let stdout = "";
+      let stderr = "";
       this.client.exec(command, (err, stream) => {
         if (err) {
           rej(err);
           return;
         }
         stream.on("close", (code: number) => {
-          res({ code, stdout: stdoutStr, stderr: stderrStr });
+          const result = { command, code, stdout, stderr };
+          if (code === 0) res(result);
+          else rej(result);
         });
         stream.on("data", (data: Buffer) => {
-          onData && onData(data);
-          stdout && stdout(`${data}`);
-          stdoutStr += `${data}`;
+          on_data && on_data(data);
+          on_stdout && on_stdout(`${data}`);
+          stdout += `${data}`;
         });
         stream.stderr.on("data", (data: Buffer) => {
-          onErrorData && onErrorData(data);
-          stderr && stderr(`${data}`)
-          stderrStr += `${data}`;
+          on_error_data && on_error_data(data);
+          on_stderr && on_stderr(`${data}`)
+          stderr += `${data}`;
         });
       });
     });

@@ -1,16 +1,16 @@
 services:
   nginx:
     image: nginx:latest
+    restart: always
     ports:
       - 80:80
       - 443:443
-    restart: always
     volumes:
-      - ${WORK_DIR}/runtime/nginx/conf/:/etc/nginx/conf.d/:ro
-      - ${WORK_DIR}/runtime/certbot/www:/var/www/certbot/:ro
-      - ${WORK_DIR}/runtime/certbot/conf/:/etc/nginx/ssl/:ro
+      - runtime/nginx/conf/:/etc/nginx/conf.d/:ro
+      - runtime/certbot/www:/var/www/certbot/:ro
+      - runtime/certbot/conf/:/etc/nginx/ssl/:ro
   certbot:
     image: certbot/certbot:latest
     volumes:
-      - ${WORK_DIR}/runtime/certbot/www/:/var/www/certbot/:rw
-      - ${WORK_DIR}/runtime/certbot/conf/:/etc/letsencrypt/:rw
+      - runtime/certbot/www/:/var/www/certbot/:rw
+      - runtime/certbot/conf/:/etc/letsencrypt/:rw
