@@ -22,8 +22,7 @@ export default class RemoteGit extends RemoteSoftware {
       option.author && `--author="${option.author}"`,
     ].filter(o => o).join(" ");
 
-    // return cmd
-    return `git ${gitOptionStr} ${cmd} ${cmdOptionStr}`;
+    return ["git", gitOptionStr, cmd, cmdOptionStr].join(" ");
   }
 
   public async version(): Promise<string> {
@@ -40,18 +39,18 @@ export default class RemoteGit extends RemoteSoftware {
   }
 
   public diffHead(option: GitOption = {}): Promise<RemoteExecResult> {
-    return this.client.exec(this.gitCmd("add -N .", option) + "&& " + this.gitCmd("diff HEAD", option));
+    return this.client.exec(this.gitCmd("add -N .", option) + " && " + this.gitCmd("diff HEAD", option));
   }
 
-  public add(option: GitOption = {}): Promise<RemoteExecResult> {
+  public addAll(option: GitOption = {}): Promise<RemoteExecResult> {
     return this.client.exec(this.gitCmd("add .", option));
   }
 
   public async commit(option: GitOption = {}): Promise<RemoteExecResult> {
     const git = simpleGit();
     const [user, email] = await Promise.all([
-      git.getConfig("user.name", "global"),
-      git.getConfig("user.email", "global"),
+      git.getConfig("user.name"),
+      git.getConfig("user.email"),
     ]);
     return await this.client.exec(this.gitCmd("commit", {
       author: `${user.value} <${email.value}>`,

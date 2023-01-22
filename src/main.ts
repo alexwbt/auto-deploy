@@ -4,5 +4,8 @@ import remoteSession from "./remote/remoteSession";
 
 remoteSession(async remote => {
   // await initialize(remote);
-  await syncPackage(remote, { envName: "uat" });
+
+  await syncPackage(remote,
+    ["compose", "runtime", "Makefile"],
+    { init: false, envName: "uat" });
 });
