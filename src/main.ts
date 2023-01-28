@@ -7,5 +7,5 @@ remoteSession(async remote => {
 
   await syncPackage(remote,
     ["compose", "runtime", "Makefile"],
-    { init: false, envName: "uat" });
+    { envName: "uat" });
 });

@@ -1,10 +1,10 @@
 import Remote from "../remote/Remote";
 import { RemoteExecResult } from "../remote/RemoteClient";
+import { getEnvString } from "../utils/env";
 import { buildEnvFile } from "../utils/envBuilder";
 
 export type SyncConfig = {
   dir?: string;
-  init?: boolean;
   envName?: string;
   commitMessage?: string;
   envFilePath?: string;
@@ -17,22 +17,20 @@ const syncPackage = async (remote: Remote, packageList: string[], config: SyncCo
   const destDir = `${config.dir || "~"}/${config.envName || ""}`;
 
   // build env
-  buildEnvFile(`${packageDirName}/.env`, {
+  const env = await buildEnvFile(`${packageDirName}/.env`, {
     "WORK_DIR": destDir,
+    "USER": getEnvString("REMOTE_USER", "ec2-user"),
   });
   console.log("Built env file");
+  console.log(`-------\n${env}\n-------`);
 
   // pre-upload checks
   const testRes = await remote.client
     .exec("test -d " + destDir)
     .catch<RemoteExecResult>(e => e);
+  const init = !!testRes.code;
 
-  if (!config.init === !!testRes.code)
-    throw new Error(config.init
-      ? `Failed to init package, ${destDir} already exists.`
-      : `Failed to sync package, ${destDir} does not exist.`);
-
-  if (!config.init) {
+  if (!init) {
     const diffRes = await remote.git.diffHead({ dir: destDir });
     if (diffRes.stdout) {
       console.log(diffRes.stdout);
@@ -52,12 +50,12 @@ const syncPackage = async (remote: Remote, packageList: string[], config: SyncCo
     + `&& rm -rf ${packageDirName}`);
 
   // commit
-  if (config.init) {
+  if (init) {
     await remote.git.init({ dir: destDir });
   }
   await remote.git.addAll({ dir: destDir });
   await remote.git.commit({
-    message: config.init
+    message: init
       ? "initial commit"
       : "syncPackage",
     dir: destDir,
