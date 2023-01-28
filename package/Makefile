@@ -1,21 +1,26 @@
 include .env
 
-certbot:
-	docker-compose -f compose/infra-compose.yml --env-file .env run --rm certbot certonly --webroot --webroot-path /var/www/certbot/ -d alexwbt.com
-	sudo chown -R ${USER}:${USER} runtime
-	git add . && git commit -m "certbot"
+define update
+	sudo chown -fR ${USER}:${USER} runtime
+	git add .
+	git diff-index --quiet HEAD || git commit -m "$@"
+endef
+
+certbot: nginx_http
+	-docker-compose -f compose/infra-compose.yml --env-file .env \
+		run --rm certbot certonly --webroot --webroot-path /var/www/certbot/ \
+		-d alexwbt.com -d www.alexwbt.com \
+		--non-interactive --agree-tos -m ${CERT_EMAIL}
+	$(call update)
 
 certbot_renew:
-	docker-compose -f compose/infra-compose.yml --env-file .env run --rm certbot renew
-	sudo chown -R ${USER}:${USER} runtime
-	git add . && git commit -m "certbot renew"
+	-docker-compose -f compose/infra-compose.yml --env-file .env run --rm certbot renew
+	$(call update)
 
 nginx_http:
-	docker-compose -f compose/infra-compose.yml --env-file .env up -d nginx_http
-	sudo chown -R ${USER}:${USER} runtime
-	git add . && git commit -m "nginx_http"
+	-docker-compose -f compose/infra-compose.yml --env-file .env up -d nginx_http
+	$(call update)
 
 nginx:
-	docker-compose -f compose/infra-compose.yml --env-file .env up -d nginx
-	sudo chown -R ${USER}:${USER} runtime
-	git add . && git commit -m "nginx"
+	-docker-compose -f compose/infra-compose.yml --env-file .env up -d nginx
+	$(call update)

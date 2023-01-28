@@ -6,6 +6,6 @@ remoteSession(async remote => {
   // await initialize(remote);
 
   await syncPackage(remote,
-    ["compose", "runtime", "Makefile"],
+    ["compose", "config", "Makefile"],
     { envName: "uat" });
 });

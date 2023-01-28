@@ -1,6 +1,6 @@
 import Remote from "../remote/Remote";
 import { RemoteExecResult } from "../remote/RemoteClient";
-import { getEnvString } from "../utils/env";
+import { getEnvString, getEnvStringRequired } from "../utils/env";
 import { buildEnvFile } from "../utils/envBuilder";
 
 export type SyncConfig = {
@@ -20,6 +20,7 @@ const syncPackage = async (remote: Remote, packageList: string[], config: SyncCo
   const env = await buildEnvFile(`${packageDirName}/.env`, {
     "WORK_DIR": destDir,
     "USER": getEnvString("REMOTE_USER", "ec2-user"),
+    "CERT_EMAIL": getEnvStringRequired("CERT_EMAIL"),
   });
   console.log("Built env file");
   console.log(`-------\n${env}\n-------`);
