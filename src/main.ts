@@ -5,7 +5,5 @@ import remoteSession from "./remote/remoteSession";
 remoteSession(async remote => {
   // await initialize(remote);
 
-  await syncPackage(remote,
-    ["compose", "config", "Makefile"],
-    { envName: "uat" });
+  await syncPackage(remote, "alexwbt.com", { dir: "~/prod", keep: ["runtime"] });
 });

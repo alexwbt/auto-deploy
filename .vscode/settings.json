@@ -1,7 +1,11 @@
 {
   "cSpell.words": [
+    "alexwbt",
     "certbot",
-    "letsencrypt"
+    "iname",
+    "letsencrypt",
+    "maxdepth",
+    "mindepth"
   ],
   "editor.tabSize": 2
 }
