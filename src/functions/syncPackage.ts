@@ -1,6 +1,5 @@
 import Remote from "../remote/Remote";
 import { RemoteExecResult } from "../remote/RemoteClient";
-import { getEnvString, getEnvStringRequired } from "../utils/env";
 import { buildEnvFile } from "../utils/envBuilder";
 
 export type SyncConfig = {
@@ -15,6 +14,11 @@ export type SyncConfig = {
    * List of name to keep while sync package
    */
   keep?: string[];
+
+  /**
+   * Runtime environment variables
+   */
+  env?: { [key: string]: string };
 };
 
 const syncPackage = async (remote: Remote, domain: string, config: SyncConfig = {}) => {
@@ -24,12 +28,10 @@ const syncPackage = async (remote: Remote, domain: string, config: SyncConfig = 
 
   // build env
   const env = await buildEnvFile(`${packageDomainDir}/.env`, {
+    ...config.env,
     "WORK_DIR": destDomainDir,
-    "USER": getEnvString("REMOTE_USER", "ec2-user"),
-    "CERT_EMAIL": getEnvStringRequired("CERT_EMAIL"),
   });
-  console.log("-------\n.env");
-  console.log(`-------\n${env}\n-------`);
+  console.log(`-------\n.env\n-------\n${env}\n-------`);
 
   // pre-upload checks
   const testRes = await remote.client
