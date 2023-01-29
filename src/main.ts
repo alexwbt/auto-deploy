@@ -12,6 +12,6 @@ remoteSession(async remote => {
     env: {
       "USER": getEnvString("REMOTE_USER", "ec2-user"),
       "CERT_EMAIL": getEnvStringRequired("CERT_EMAIL"),
-    }
+    },
   });
 });
