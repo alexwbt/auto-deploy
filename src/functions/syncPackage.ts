@@ -7,39 +7,58 @@ import renderDirectory from "./renderDirectory";
 export type SyncConfig = {
   /**
    * Remote destination directory
-   * default "~/"
-   * passing empty string will result to root directory "/"
+   * - default to "~/"
+   * - passing empty string will result to root directory "/"
    */
   dir?: string;
 
   /**
-   * Package directory
+   * Package directory.
    */
   package?: string;
 
   /**
-   * List of name to keep while sync package
+   * Use package as a template if true.
+   */
+  packageTemplate?: boolean;
+
+  /**
+   * commit message.
+   */
+  message?: string;
+
+  /**
+   * List of name to keep while sync package.
    */
   keep?: string[];
 
   /**
-   * Runtime environment variables
+   * Runtime environment variables.
+   * Also used as template variables.
    */
   env?: { [key: string]: string };
 };
 
 const syncPackage = async (remote: Remote, domain: string, config: SyncConfig = {}) => {
-  const packageTmpDir = "package_tmp";
-  const packageDomainDir = `${packageTmpDir}/${domain}`;
+  const packageTmpDir = !!config.packageTemplate && "package_tmp";
+  const packageDir = config.package || "package";
+
+  // actual package directory to upload
+  const package_ = packageTmpDir || packageDir;
+
+  // domain directory
+  const packageDomainDir = `${package_}/${domain}`;
   const destDomainDir = `${config.dir || "~"}/${domain}`;
 
+  // env data
   const envData = {
     ...config.env,
     "WORK_DIR": destDomainDir,
   };
 
   // render template
-  await renderDirectory(config.package || "package", packageTmpDir, envData);
+  if (packageTmpDir)
+    await renderDirectory(packageDir, packageTmpDir, envData);
 
   // build env
   const envResult = await buildEnvFile(`${packageDomainDir}/.env`, envData);
@@ -73,7 +92,7 @@ const syncPackage = async (remote: Remote, domain: string, config: SyncConfig = 
   await remote.client.exec(`cp -rfu -t ${destDomainDir} `
     + `${destDomainDir}/${packageDomainDir}/* `
     + `${destDomainDir}/${packageDomainDir}/.[^.]*`);
-  await remote.client.exec(`rm -rf ${destDomainDir}/${packageTmpDir}`);
+  await remote.client.exec(`rm -rf ${destDomainDir}/${package_}`);
 
   // commit
   if (init) {
@@ -88,16 +107,17 @@ const syncPackage = async (remote: Remote, domain: string, config: SyncConfig = 
     console.warn("No Change Detected");
 
   await remote.git.commit({
-    message: init
+    message: config.message || (init
       ? "initial commit"
-      : "syncPackage",
+      : "syncPackage"),
     dir: destDomainDir,
   }).catch(() => {
     console.warn("Failed To Commit");
   });
 
   // remove packageTmp
-  await fs.promises.rm(packageTmpDir, { recursive: true, force: true });
+  if (packageTmpDir)
+    await fs.promises.rm(packageTmpDir, { recursive: true, force: true });
 
   console.log("Sync Package Complete");
 };

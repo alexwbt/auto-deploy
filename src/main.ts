@@ -9,6 +9,7 @@ remoteSession(async remote => {
   await syncPackage(remote, "alexwbt.com", {
     dir: "~/prod",
     keep: ["runtime"],
+    packageTemplate: true,
     env: {
       "USER": getEnvStringRequired("REMOTE_USER"),
       "CERT_EMAIL": getEnvStringRequired("CERT_EMAIL"),
