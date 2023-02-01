@@ -1,6 +1,6 @@
 import Remote from "../remote/Remote";
 import { RemoteExecResult } from "../remote/RemoteClient";
-import { buildEnvFile } from "../utils/envBuilder";
+import buildEnvFile from "./buildEnvFile";
 
 export type SyncConfig = {
   /**

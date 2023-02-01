@@ -1,7 +1,6 @@
+import fs from "fs";
 import { Client } from "ssh2";
 import tar from "tar";
-import fs from "fs";
-import util from "util";
 
 export type RemoteExecConfig = {
   on_stdout?: (data: string) => void;
@@ -83,7 +82,7 @@ export default class RemoteClient {
     });
 
     // rm tmp file
-    await util.promisify(fs.rm)(file);
+    await fs.promises.rm(file);
 
     // throw upload error
     if (uploadError) throw uploadError;

@@ -9,7 +9,7 @@ endef
 certbot: nginx_http
 	-docker-compose -f compose/infra-compose.yml --env-file .env \
 		run --rm certbot certonly --webroot --webroot-path /var/www/certbot/ \
-		-d alexwbt.com -d www.alexwbt.com \
+		-d {{ALEXWBT_DOMAIN}} -d www.{{ALEXWBT_DOMAIN}} \
 		--non-interactive --agree-tos -m ${CERT_EMAIL}
 	$(call update)
 
