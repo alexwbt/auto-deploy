@@ -107,9 +107,7 @@ const syncPackage = async (remote: Remote, domain: string, config: SyncConfig = 
     console.warn("No Change Detected");
 
   await remote.git.commit({
-    message: config.message || (init
-      ? "initial commit"
-      : "syncPackage"),
+    message: config.message || (init ? "initial commit" : "sync package"),
     dir: destDomainDir,
   }).catch(() => {
     console.warn("Failed To Commit");
