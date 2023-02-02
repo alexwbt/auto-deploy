@@ -1,5 +1,5 @@
 services:
-
+  # Nginx HTTP
   nginx_http:
     image: nginx:latest
     container_name: nginx_http
@@ -9,6 +9,7 @@ services:
       - ${WORK_DIR}/config/nginx_http/conf/:/etc/nginx/conf.d/:ro
       - ${WORK_DIR}/runtime/certbot/www:/var/www/certbot/:ro
 
+  # Nginx
   nginx:
     image: nginx:latest
     container_name: nginx
@@ -18,6 +19,7 @@ services:
       - ${WORK_DIR}/config/nginx/conf/:/etc/nginx/conf.d/:ro
       - ${WORK_DIR}/runtime/certbot/conf/:/etc/nginx/ssl/:ro
 
+  # Certbot
   certbot:
     image: certbot/certbot:latest
     container_name: certbot

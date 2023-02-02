@@ -1,4 +1,4 @@
-import Remote from "../remote/Remote";
+import Remote from "../lib/remote/Remote";
 
 const initialize = async (remote: Remote) => {
   console.log(await remote.machine.init());

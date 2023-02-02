@@ -1,8 +1,8 @@
 import fs from "fs";
-import Remote from "../remote/Remote";
-import { RemoteExecResult } from "../remote/RemoteClient";
-import buildEnvFile from "./buildEnvFile";
-import renderDirectory from "./renderDirectory";
+import Remote from "../lib/remote/Remote";
+import { RemoteExecResult } from "../lib/remote/RemoteClient";
+import renderDirectory from "../lib/template/renderDirectory";
+import buildEnvFile from "../lib/utils/buildEnvFile";
 
 export type SyncConfig = {
   /**

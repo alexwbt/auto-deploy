@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { forEachFile } from "../utils/file";
-import handlebars from "../utils/handlebars";
+import handlebars from "./handlebars";
 
 const renderDirectory = (
   srcDir: string,

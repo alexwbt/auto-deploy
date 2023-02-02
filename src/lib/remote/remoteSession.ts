@@ -1,10 +1,12 @@
-import createRemote from "./createRemote";
-import createRemoteConfig from "./createRemoteConfig";
+import createRemote, { RemoteConfig } from "./createRemote";
 import Remote from "./Remote";
 
-const remoteSession = async (run: (remote: Remote) => Promise<void>) => {
+const remoteSession = async (
+  config: RemoteConfig,
+  run: (remote: Remote) => Promise<void>
+) => {
   console.log("connecting...");
-  const remote = await createRemote(createRemoteConfig);
+  const remote = await createRemote(config);
   console.log("connected");
 
   try {
