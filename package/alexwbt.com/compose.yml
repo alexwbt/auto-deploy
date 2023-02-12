@@ -26,3 +26,27 @@ services:
     volumes:
       - ${WORK_DIR}/runtime/certbot/www/:/var/www/certbot/:rw
       - ${WORK_DIR}/runtime/certbot/conf/:/etc/letsencrypt/:rw
+
+  # Keycloak
+  # keycloak:
+  #   container_name: keycloak
+  #   image: jboss/keycloak:latest
+
+  #   environment:
+  #     PROXY_ADDRESS_FORWARDING: 'true'
+  #     KEYCLOAK_FRONTEND_URL: https://alexwbt.com/auth/
+  #     DB_VENDOR: postgres
+  #     DB_ADDR: ${KEYCLOAK_DB_ADDR}
+  #     DB_PORT: ${KEYCLOAK_DB_PORT}
+  #     DB_SCHEMA: keycloak
+  #     DB_DATABASE: keycloak
+  #     DB_USER: keycloak
+  #     DB_PASSWORD_FILE: /env/secret/db_password_file
+  #   ports:
+  #     - ${KEYCLOAK_TCP_PORT}:${KEYCLOAK_TCP_PORT}
+
+  #   volumes:
+  #     - ${PWD}/env/secret/keycloak-db_password_file:/env/secret/db_password_file
+  #     - ${PWD}/volumes/keycloak/discovery:/opt/jboss/tools/cli/jgroups/discovery
+
+  #   entrypoint: /opt/jboss/tools/docker-entrypoint.sh

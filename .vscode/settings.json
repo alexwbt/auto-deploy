@@ -3,6 +3,7 @@
     "alexwbt",
     "certbot",
     "iname",
+    "keycloak",
     "letsencrypt",
     "maxdepth",
     "mindepth"

@@ -5,6 +5,9 @@ export type AlexwbtEnv = {
   CERT_EMAIL: string;
   REMOTE_USER: string;
   ALEXWBT_DOMAIN: string;
+
+  // KEYCLOAK_DB_ADDR: string;
+  // KEYCLOAK_DB_PORT: number;
 };
 
 export default class AlexwbtDomain extends Domain<AlexwbtEnv> {

@@ -18,13 +18,7 @@ certbot_renew:
 	$(call update_runtime)
 
 nginx_http:
-	-docker-compose --env-file .env up -d nginx_http
+	docker-compose --env-file .env up -d nginx_http
 
 nginx:
-	-docker-compose --env-file .env up -d nginx
-
-redis:
-	-docker-compose --env-file .env up -d redis
-
-emailengine:
-	-docker-compose --env-file .env up -d emailengine
+	docker-compose --env-file .env up -d nginx
