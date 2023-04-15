@@ -1,6 +1,6 @@
 include .env
 
-certbot: nginx_http
+certbot:
 	docker-compose \
 		run --rm certbot certonly --webroot --webroot-path /var/www/certbot/ \
 		-d {{ALEXWBT_DOMAIN}} -d www.{{ALEXWBT_DOMAIN}} -d mail.{{ALEXWBT_DOMAIN}} \

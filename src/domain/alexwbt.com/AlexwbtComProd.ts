@@ -5,7 +5,7 @@ import { EnvHandler } from "../Domain";
 export default class AlexwbtComProd implements EnvHandler<AlexwbtComEnv, AlexwbtComTemplateEnv> {
 
   public getRootDir(): string {
-    return "/app/prod";
+    return "~/prod";
   }
 
   public async buildEnv(): Promise<AlexwbtComEnv> {
