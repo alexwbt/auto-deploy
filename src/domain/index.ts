@@ -1,10 +1,14 @@
-import AlexwbtDomain from "./alexwbt.com";
+// import DemoProd from "./demo/DemoProd";
+// import DemoUat from "./demo/DemoUat";
 import Domain from "./Domain";
 
 const DOMAIN_INSTANCES = {
-  "alexwbt.com": new AlexwbtDomain(),
+  // "demo": new Domain({
+  //   "uat": new DemoUat(),
+  //   "prod": new DemoProd(),
+  // }),
 } as {
-  readonly [domain: string]: Domain<any> | undefined;
+  readonly [domain: string]: Domain<any, any> | undefined;
 };
 
 export const getDomainInstance = (domain: string) => {

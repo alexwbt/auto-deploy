@@ -1,12 +1,15 @@
+import createJumpRemote, { JumpRemoteConfig } from "./createJumpRemote";
 import createRemote, { RemoteConfig } from "./createRemote";
 import Remote from "./Remote";
 
 const remoteSession = async (
-  config: RemoteConfig,
+  config: ({ jump: true; } & JumpRemoteConfig) | ({ jump: false; } & RemoteConfig),
   run: (remote: Remote) => Promise<void>
 ) => {
   console.log("connecting...");
-  const remote = await createRemote(config);
+  const remote = await (config.jump
+    ? createJumpRemote(config)
+    : createRemote(config));
   console.log("connected");
 
   try {

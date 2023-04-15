@@ -20,10 +20,13 @@ export default class RemoteClient {
 
   constructor(
     private client: Client,
+    private jumpClient?: Client,
   ) { }
 
   public end() {
     this.client.end();
+    if (this.jumpClient)
+      this.jumpClient.end();
   }
 
   public exec(command: string, {

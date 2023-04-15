@@ -53,8 +53,8 @@ export default class RemoteGit extends RemoteSoftware {
       git.getConfig("user.email"),
     ]);
     return await this.client.exec(this.gitCmd("commit", {
-      author: `${user.value} <${email.value}>`,
       ...option,
+      author: option.author || `${user.value} <${email.value}>`,
     }));
   }
 

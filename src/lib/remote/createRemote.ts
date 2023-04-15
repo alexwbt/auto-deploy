@@ -7,7 +7,9 @@ export type RemoteConfig = {
   port: number;
   host: string;
   username: string;
-  privateKey: string;
+  password?: string;
+  privateKey?: string;
+  passphrase?: string;
   timeout?: number;
 };
 
@@ -15,7 +17,9 @@ const createRemote = async ({
   port,
   host,
   username,
+  password,
   privateKey,
+  passphrase,
   timeout,
 }: RemoteConfig) => {
   const _timeout = Number(timeout) > 0 ? timeout : 10000;
@@ -26,12 +30,13 @@ const createRemote = async ({
     setTimeout(rej, _timeout);
   });
 
-  const privateKeyData = await fs.promises.readFile(privateKey);
   client.connect({
     port,
     host,
     username,
-    privateKey: privateKeyData,
+    password,
+    privateKey: privateKey && await fs.promises.readFile(privateKey),
+    passphrase,
     timeout: _timeout,
   });
 
