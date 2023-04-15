@@ -1,12 +1,10 @@
-// import DemoProd from "./demo/DemoProd";
-// import DemoUat from "./demo/DemoUat";
+import AlexwbtComProd from "./alexwbt.com/AlexwbtComProd";
 import Domain from "./Domain";
 
 const DOMAIN_INSTANCES = {
-  // "demo": new Domain({
-  //   "uat": new DemoUat(),
-  //   "prod": new DemoProd(),
-  // }),
+  "alexwbt.com": new Domain({
+    "prod": new AlexwbtComProd(),
+  }),
 } as {
   readonly [domain: string]: Domain<any, any> | undefined;
 };
