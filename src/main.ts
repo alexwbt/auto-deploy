@@ -3,23 +3,11 @@ import initialize from "./core/initialize";
 import syncPackage from "./core/syncPackage";
 import testConnection from "./core/testConnection";
 import { getDomainInstance } from "./domain";
+import { RemoteConfig } from "./lib/remote/createRemote";
+import { JumpRemoteConfig } from "./lib/remote/createJumpRemote";
 import remoteSession from "./lib/remote/remoteSession";
 import packageEnvHook from "./lib/template/packageEnvHook";
-import { getEnvNumber, getEnvString, getEnvStringRequired } from "./lib/utils/env";
-
-const remoteConfig = {
-  port: getEnvNumber("REMOTE_PORT", 22),
-  host: getEnvStringRequired("REMOTE_HOST"),
-  username: getEnvStringRequired("REMOTE_USER"),
-  password: getEnvString("REMOTE_USER_PASSWORD") || undefined,
-  privateKey: getEnvString("REMOTE_PRIVATE_KEY") || undefined,
-  passphrase: getEnvString('REMOTE_PRIVATE_KEY_PASSPHRASE') || undefined,
-
-  jumpHost: getEnvStringRequired("JUMP_HOST"),
-  jumpHostPort: getEnvNumber("JUMP_HOST_PORT", 22),
-  jumpHostUsername: getEnvStringRequired("JUMP_HOST_USER"),
-  jumpHostPrivateKey: getEnvStringRequired("JUMP_HOST_PRIVATE_KEY"),
-};
+import { getEnv, getEnvNumber, getEnvStringRequired } from "./lib/utils/env";
 
 const args = arg({
   "--test": Boolean,
@@ -43,11 +31,36 @@ const args = arg({
   '-a': '--author',
 });
 
-// remote actions
-remoteSession({
-  jump: !!args["--jump"],
-  ...remoteConfig,
-}, async remote => {
+
+//
+// Remote Configs
+//
+const remoteConfig = (): { jump: false } & RemoteConfig => ({
+  jump: false,
+  port: getEnvNumber("REMOTE_PORT", 22),
+  host: getEnvStringRequired("REMOTE_HOST"),
+  username: getEnvStringRequired("REMOTE_USER"),
+  password: getEnv("REMOTE_USER_PASSWORD"),
+  privateKey: getEnv("REMOTE_PRIVATE_KEY"),
+  passphrase: getEnv('REMOTE_PRIVATE_KEY_PASSPHRASE'),
+});
+
+const jumpRemoteConfig = (): { jump: true } & JumpRemoteConfig => ({
+  ...remoteConfig(),
+  jump: true,
+  jumpHost: getEnvStringRequired("JUMP_HOST"),
+  jumpHostPort: getEnvNumber("JUMP_HOST_PORT", 22),
+  jumpHostUsername: getEnvStringRequired("JUMP_HOST_USER"),
+  jumpHostPrivateKey: getEnvStringRequired("JUMP_HOST_PRIVATE_KEY"),
+});
+
+const config = args["--jump"] ? jumpRemoteConfig() : remoteConfig();
+
+
+//
+// Remote Actions
+//
+remoteSession(config, async remote => {
 
   if (args["--test"]) {
     await testConnection(remote);
