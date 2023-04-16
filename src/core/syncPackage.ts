@@ -40,12 +40,17 @@ export type SyncConfig = {
   /**
    * Package hook, called after rendering package dir.
    */
-  packageHook?: (targetDir: string) => Promise<void>;
+  packageHook?: (packageDir: string) => Promise<void>;
 
   /**
    * Unpack hook, called after unpacking package on remote.
    */
   unpackHook?: (targetDir: string) => Promise<void>;
+
+  /**
+   * Complete hook, called after sync package complete.
+   */
+  completeHook?: (targetDir: string) => Promise<void>;
 
   /**
    * Verbose setting.
@@ -113,11 +118,9 @@ const syncPackage = async (remote: Remote, domain: string, config: SyncConfig = 
       + `${destDomainDir}/${packageDomainDir}/.[^.]*`);
     await remote.client.exec(`rm -rf ${destDomainDir}/${packageTmpDir}`);
     // unpack hook
-    try {
-      config.unpackHook && await config.unpackHook(destDomainDir);
-    } catch (e) {
-      console.log("Unpack hook failed.", e)
-    }
+    config.unpackHook && await config.unpackHook(destDomainDir)
+      .then(() => console.log("Ran unpack hook"))
+      .catch(() => console.log("Unpack hook failed"));
 
     // commit
     if (init) {
@@ -149,6 +152,10 @@ const syncPackage = async (remote: Remote, domain: string, config: SyncConfig = 
     await fs.promises.rm(packageTmpDir, { recursive: true, force: true });
 
   console.log("Sync Package Complete");
+
+  config.completeHook && await config.completeHook(destDomainDir)
+    .then(() => console.log("Ran complete hook"))
+    .catch(() => console.log("Complete hook failed"));
 };
 
 export default syncPackage;

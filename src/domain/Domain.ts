@@ -5,6 +5,7 @@ export interface EnvHandler<EnvType, TemplateEnvType> {
   buildEnv(): Promise<EnvType>;
   buildTemplateEnv(): Promise<TemplateEnvType>;
   unpackHook(remote: Remote, targetDir: string): Promise<void>;
+  completeHook(remote: Remote, targetDir: string): Promise<void>;
 }
 
 export default class Domain<EnvType, TemplateEnvType> {
@@ -34,6 +35,10 @@ export default class Domain<EnvType, TemplateEnvType> {
 
   public unpackHook(env: string, remote: Remote, targetDir: string): Promise<void> {
     return this.getEnv(env).unpackHook(remote, targetDir);
+  }
+
+  public completeHook(env: string, remote: Remote, targetDir: string): Promise<void> {
+    return this.getEnv(env).completeHook(remote, targetDir);
   }
 
 }

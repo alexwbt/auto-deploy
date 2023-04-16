@@ -20,8 +20,8 @@ export default class DemoProd implements EnvHandler<DemoEnv, DemoTemplateEnv> {
     };
   }
 
-  public async unpackHook(remote: Remote, targetDir: string): Promise<void> {
+  public async unpackHook(remote: Remote, targetDir: string): Promise<void> {}
 
-  }
+  public async completeHook(remote: Remote, targetDir: string): Promise<void> {}
 
 }

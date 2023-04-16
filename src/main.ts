@@ -88,8 +88,9 @@ remoteSession(config, async remote => {
       message: args["--message"],
       env: await domain.buildEnv(env),
       templateEnv: await domain.buildTemplateEnv(env),
-      packageHook: target => packageEnvHook(domainName, env, "_env", target),
-      unpackHook: target => domain.unpackHook(env, remote, target),
+      packageHook: packageDir => packageEnvHook(domainName, env, "_env", packageDir),
+      unpackHook: targetDir => domain.unpackHook(env, remote, targetDir),
+      completeHook: targetDir => domain.completeHook(env, remote, targetDir),
       verbose: args["--verbose"],
       author: args["--author"],
     });
