@@ -1,5 +1,8 @@
 include .env
 
+ps:
+	docker ps --format 'table \{{.ID}}\t\{{.Names}}\t\{{.Status}}\t\{{.RunningFor}}\t\{{.Image}}'
+
 certbot:
 	docker-compose \
 		run --rm certbot certonly --webroot --webroot-path /var/www/certbot/ \
