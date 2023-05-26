@@ -27,3 +27,8 @@ services:
     volumes:
       - ${WORK_DIR}/runtime/certbot/www/:/var/www/certbot/:rw
       - ${WORK_DIR}/runtime/certbot/conf/:/etc/letsencrypt/:rw
+
+  # alexwbt
+  alexwbt:
+    image: alexwbt:latest
+    container_name: alexwbt
