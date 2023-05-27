@@ -32,3 +32,8 @@ services:
   alexwbt:
     image: alexwbt:latest
     container_name: alexwbt
+
+  # alexwbt-api
+  alexwbt-api:
+    image: alexwbt-api:latest
+    container_name: alexwbt-api
