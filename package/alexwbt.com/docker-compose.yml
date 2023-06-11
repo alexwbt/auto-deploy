@@ -42,6 +42,8 @@ services:
     restart: always
     image: alexwbt-api:latest
     container_name: alexwbt-api
+    environment:
+      DATABASE_URL: ${ALEXWBT_API_DATABASE_URL}
 
   # MySql
   mysql:
