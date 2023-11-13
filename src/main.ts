@@ -22,6 +22,7 @@ const args = arg({
   "--message": String,
   "--verbose": Boolean,
   "--author": String,
+  "--debug": Boolean,
 
   // Aliases
   '-v': '--verbose',
@@ -43,6 +44,8 @@ const remoteConfig = (): { jump: false } & RemoteConfig => ({
   password: getEnv("REMOTE_USER_PASSWORD"),
   privateKey: getEnv("REMOTE_PRIVATE_KEY"),
   passphrase: getEnv('REMOTE_PRIVATE_KEY_PASSPHRASE'),
+  httpProxyHost: getEnv('REMOTE_HTTP_PROXY_HOST'),
+  httpProxyPort: getEnvNumber('REMOTE_HTTP_PROXY_PORT', 1080),
 });
 
 const jumpRemoteConfig = (): { jump: true } & JumpRemoteConfig => ({
@@ -60,44 +63,55 @@ const config = args["--jump"] ? jumpRemoteConfig() : remoteConfig();
 //
 // Remote Actions
 //
-remoteSession(config, async remote => {
+(async () => {
 
-  if (args["--test"]) {
-    await testConnection(remote);
-    return;
-  }
+  const success = await remoteSession(config, async remote => {
 
-  if (args["--init"]) {
-    await initialize(remote);
-    return;
-  }
+    if (args["--test"]) {
+      await testConnection(remote);
+      return;
+    }
 
-  if (args["--deploy"]) {
-    const domainName = args["--domain"];
-    if (!domainName)
-      throw new Error("Domain name [--domain] is required.");
+    if (args["--init"]) {
+      await initialize(remote);
+      return;
+    }
 
-    const env = args["--env"];
-    if (!env)
-      throw new Error("Environment name [--env] is required.");
+    if (args["--deploy"]) {
+      const domainName = args["--domain"];
+      if (!domainName)
+        throw new Error("Domain name [--domain] is required.");
 
-    const domain = getDomainInstance(domainName);
-    await syncPackage(remote, domainName, {
-      dir: domain.getRootDir(env),
-      keep: ["runtime"],
-      message: args["--message"],
-      env: await domain.buildEnv(env),
-      templateEnv: await domain.buildTemplateEnv(env),
-      packageHook: packageDir => packageEnvHook(domainName, env, "_env", packageDir),
-      unpackHook: targetDir => domain.unpackHook(env, remote, targetDir),
-      completeHook: targetDir => domain.completeHook(env, remote, targetDir),
-      verbose: args["--verbose"],
-      author: args["--author"],
-    });
+      const env = args["--env"];
+      if (!env)
+        throw new Error("Environment name [--env] is required.");
 
-    return;
-  }
+      const domain = getDomainInstance(domainName);
+      await syncPackage(remote, domainName, {
+        dir: domain.getRootDir(env),
+        keep: ["runtime"],
+        message: args["--message"],
+        env: await domain.buildEnv(env),
+        templateEnv: await domain.buildTemplateEnv(env),
+        templateExcludeRegex: /^.*\.(jks)$/,
+        packageHook: packageDir => packageEnvHook(domainName, env, "_env", packageDir),
+        unpackHook: targetDir => domain.unpackHook(env, remote, targetDir),
+        completeHook: targetDir => domain.completeHook(env, remote, targetDir),
+        verbose: args["--verbose"],
+        author: args["--author"],
+        debug: args["--debug"],
+      });
 
-  console.warn("Did not perform any remote action.");
+      return;
+    }
 
-}).catch(e => console.error("Error: ", e));
+    console.warn("Did not perform any remote action.");
+
+  }).catch(e => {
+    console.error("Error: ", e);
+    return false;
+  });
+
+  process.exit(success ? 0 : 1);
+
+})();

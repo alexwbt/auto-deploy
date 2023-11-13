@@ -12,15 +12,19 @@ const remoteSession = async (
     : createRemote(config));
   console.log("connected");
 
+  let success = true;
   try {
     await run(remote);
   } catch (error) {
     console.log(error);
+    success = false;
   }
 
   console.log("terminating...");
   remote.client.end();
   console.log("terminated");
+
+  return success;
 };
 
 export default remoteSession;
