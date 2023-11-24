@@ -2,6 +2,7 @@ import fs from "fs";
 import { Client } from "ssh2";
 import Remote from "./Remote";
 import RemoteClient from "./RemoteClient";
+import createHttpProxy from "./createHttpProxy";
 
 export type RemoteConfig = {
   port: number;
@@ -11,6 +12,9 @@ export type RemoteConfig = {
   privateKey?: string;
   passphrase?: string;
   timeout?: number;
+
+  httpProxyHost?: string;
+  httpProxyPort?: number;
 };
 
 const createRemote = async ({
@@ -21,13 +25,24 @@ const createRemote = async ({
   privateKey,
   passphrase,
   timeout,
+
+  httpProxyHost,
+  httpProxyPort,
 }: RemoteConfig) => {
-  const _timeout = Number(timeout) > 0 ? timeout : 10000;
+  const _timeout = timeout && Number(timeout) > 0 ? timeout : 10000;
+
+  const httpProxySocket = httpProxyHost
+    ? await createHttpProxy(
+      host, port,
+      httpProxyHost,
+      httpProxyPort || 1080, _timeout)
+    : undefined;
+
   const client = new Client();
   const clientPromise = new Promise<void>((res, rej) => {
     client.on("ready", res);
     client.on("error", rej);
-    setTimeout(rej, _timeout);
+    setTimeout(() => rej("connection timeout"), _timeout);
   });
 
   client.connect({
@@ -38,6 +53,7 @@ const createRemote = async ({
     privateKey: privateKey && await fs.promises.readFile(privateKey),
     passphrase,
     timeout: _timeout,
+    sock: httpProxySocket,
   });
 
   await clientPromise;

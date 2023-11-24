@@ -36,6 +36,7 @@ export type SyncConfig = {
    * Template variables.
    */
   templateEnv?: { [key: string]: string };
+  templateExcludeRegex?: RegExp;
 
   /**
    * Package hook, called after rendering package dir.
@@ -61,10 +62,15 @@ export type SyncConfig = {
    * Author.
    */
   author?: string;
+
+  /**
+   * Debug mode will not deploy to remote and creates rendered output of package.
+   */
+  debug?: boolean;
 };
 
 const syncPackage = async (remote: Remote, domain: string, config: SyncConfig = {}) => {
-  const packageTmpDir = "package_tmp";
+  const packageTmpDir = config.debug ? "dist" : "package_tmp";
   const packageDir = config.package || "package";
 
   // domain directory
@@ -78,13 +84,21 @@ const syncPackage = async (remote: Remote, domain: string, config: SyncConfig = 
   };
 
   // render template
-  await renderDirectory(packageDir, packageTmpDir, config.templateEnv || {});
+  await renderDirectory({
+    srcDir: packageDir,
+    destDir: packageTmpDir,
+    data: config.templateEnv,
+    excludeRegex: config.templateExcludeRegex,
+  });
   config.packageHook && await config.packageHook(packageTmpDir);
 
   try {
     // build env
     const envResult = await buildEnvFile(`${packageDomainDir}/.env`, envData);
     config.verbose && console.log(`-------\n.env\n-------\n${envResult}\n-------`);
+
+    if (config.debug)
+      return;
 
     // pre-upload checks
     const testRes = await remote.client
@@ -148,8 +162,7 @@ const syncPackage = async (remote: Remote, domain: string, config: SyncConfig = 
   }
 
   // remove packageTmp
-  if (packageTmpDir)
-    await fs.promises.rm(packageTmpDir, { recursive: true, force: true });
+  await fs.promises.rm(packageTmpDir, { recursive: true, force: true });
 
   console.log("Sync Package Complete");
 
