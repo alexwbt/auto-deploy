@@ -36,6 +36,8 @@ services:
     restart: always
     image: alexwbt:latest
     container_name: alexwbt
+    volumes:
+      - "${WORK_DIR}/config/alexwbt/config.js:/app/public/config.js:ro"
 
   # alexwbt-api
   alexwbt-api:
