@@ -26,6 +26,8 @@ export default class AlexwbtComProd implements EnvHandler<AlexwbtComEnv, Alexwbt
       `cat ${targetDir}/runtime/secret.env >> ${targetDir}/.env`);
   }
 
-  public async completeHook(remote: Remote, targetDir: string): Promise<void> {}
+  public async completeHook(remote: Remote, targetDir: string): Promise<void> {
+    await remote.client.exec("docker restart nginx");
+  }
 
 }
