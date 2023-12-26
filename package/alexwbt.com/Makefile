@@ -11,6 +11,7 @@ certbot:
 		-d mail.{{ALEXWBT_DOMAIN}} \
 		-d api.{{ALEXWBT_DOMAIN}} \
 		-d db.{{ALEXWBT_DOMAIN}} \
+		-d keycloak.{{ALEXWBT_DOMAIN}} \
 		--expand --non-interactive --agree-tos -m ${CERT_EMAIL}
 
 certbot-renew:

@@ -57,5 +57,25 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
 
+  # Keycloak
+  keycloak:
+    container_name: keycloak
+    image: jboss/keycloak:latest
+    restart: always
+
+    environment:
+      PROXY_ADDRESS_FORWARDING: 'true'
+      KEYCLOAK_FRONTEND_URL: https://keycloak.alexwbt.com/auth/
+      DB_VENDOR: mysql
+      DB_ADDR: ${KEYCLOAK_DB_ADDR}
+      DB_PORT: ${KEYCLOAK_DB_PORT}
+      DB_SCHEMA: keycloak
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+
+    entrypoint: /opt/jboss/tools/docker-entrypoint.sh
+
+
 volumes:
   mysql-data:
