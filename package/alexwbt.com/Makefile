@@ -1,8 +1,20 @@
 include .env
 
+
+# docker
 ps:
 	docker ps --format 'table \{{.ID}}\t\{{.Names}}\t\{{.Status}}\t\{{.RunningFor}}\t\{{.Image}}'
 
+
+# git
+diff:
+	git diff HEAD^ -w --ignore-space-at-eol
+
+log:
+	git log --name-status HEAD^..HEAD
+
+
+# certbot
 certbot:
 	docker-compose \
 		run --rm certbot certonly --webroot --webroot-path /var/www/certbot/ \
@@ -16,3 +28,4 @@ certbot:
 
 certbot-renew:
 	docker-compose run --rm certbot renew
+
