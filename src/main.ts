@@ -1,4 +1,5 @@
 import arg from "arg";
+import dotenv from "dotenv";
 import initialize from "./core/initialize";
 import syncPackage from "./core/syncPackage";
 import testConnection from "./core/testConnection";
@@ -31,6 +32,12 @@ const args = arg({
   '-e': '--env',
   '-a': '--author',
 });
+
+
+//
+// Load Env File
+//
+dotenv.config({ path: `./env/${args["--env"] || ""}.env` });
 
 
 //
