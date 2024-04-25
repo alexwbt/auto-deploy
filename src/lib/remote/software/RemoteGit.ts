@@ -47,14 +47,17 @@ export default class RemoteGit extends RemoteSoftware {
   }
 
   public async commit(option: GitOption = {}): Promise<RemoteExecResult> {
-    const git = simpleGit();
-    const [user, email] = await Promise.all([
-      git.getConfig("user.name"),
-      git.getConfig("user.email"),
-    ]);
     return await this.client.exec(this.gitCmd("commit", {
       ...option,
-      author: option.author || `${user.value} <${email.value}>`,
+      author: option.author || await (async () => {
+        // get local git username and email
+        const git = simpleGit();
+        const [user, email] = await Promise.all([
+          git.getConfig("user.name"),
+          git.getConfig("user.email"),
+        ]);
+        return `${user.value} <${email.value}>`;
+      })(),
     }));
   }
 
