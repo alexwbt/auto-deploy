@@ -168,7 +168,7 @@ const syncPackage = async (remote: Remote, domain: string, config: SyncConfig = 
 
   config.completeHook && await config.completeHook(destDomainDir)
     .then(() => console.log("Ran complete hook"))
-    .catch(() => console.log("Complete hook failed"));
+    .catch(e => console.error("Complete hook failed", e));
 };
 
 export default syncPackage;
