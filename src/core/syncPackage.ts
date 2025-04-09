@@ -30,12 +30,12 @@ export type SyncConfig = {
   /**
    * Runtime environment variables.
    */
-  env?: { [key: string]: string };
+  env?: { [key: string]: string; };
 
   /**
    * Template variables.
    */
-  templateEnv?: { [key: string]: string };
+  templateEnv?: { [key: string]: string; };
   templateExcludeRegex?: RegExp;
 
   /**
@@ -134,7 +134,7 @@ const syncPackage = async (remote: Remote, domain: string, config: SyncConfig = 
     // unpack hook
     config.unpackHook && await config.unpackHook(destDomainDir)
       .then(() => console.log("Ran unpack hook"))
-      .catch(() => console.log("Unpack hook failed"));
+      .catch(e => console.error("Unpack hook failed", e));
 
     // commit
     if (init) {
