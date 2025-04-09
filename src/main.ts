@@ -106,7 +106,7 @@ const config = args["--jump"] ? jumpRemoteConfig() : remoteConfig();
         message: args["--message"],
         env: await domain.buildEnv(env),
         templateEnv: await domain.buildTemplateEnv(env),
-        templateExcludeRegex: /^.*\.(jks)$/,
+        templateExcludeRegex: /^.*\.(jks|ico|webp)$/,
         packageHook: packageDir => packageEnvHook(domainName, env, "_env", packageDir),
         unpackHook: targetDir => domain.unpackHook(env, remote, targetDir),
         completeHook: targetDir => domain.completeHook(env, remote, targetDir),
