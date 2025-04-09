@@ -6,11 +6,17 @@ node . [options]
 
 ## Options
 ```
---jump
-    use jump host
+--test
+  test connection
+
+--init
+  initialize remote machine
 
 --deploy
     deploy config
+
+--jump
+    use jump host
 
 -d, --domain 
     specify domain

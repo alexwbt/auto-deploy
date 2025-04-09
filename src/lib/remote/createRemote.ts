@@ -3,8 +3,10 @@ import { Client } from "ssh2";
 import Remote from "./Remote";
 import RemoteClient from "./RemoteClient";
 import createHttpProxy from "./createHttpProxy";
+import RemoteMachines from "./software/machine";
 
 export type RemoteConfig = {
+  machine: keyof typeof RemoteMachines;
   port: number;
   host: string;
   username: string;
@@ -18,6 +20,7 @@ export type RemoteConfig = {
 };
 
 const createRemote = async ({
+  machine,
   port,
   host,
   username,
@@ -57,7 +60,7 @@ const createRemote = async ({
   });
 
   await clientPromise;
-  return new Remote(new RemoteClient(client));
+  return new Remote(new RemoteClient(client), machine);
 };
 
 export default createRemote;

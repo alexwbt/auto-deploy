@@ -2,8 +2,10 @@ import fs from "fs";
 import { Client } from "ssh2";
 import Remote from "./Remote";
 import RemoteClient from "./RemoteClient";
+import RemoteMachines from "./software/machine";
 
 export type JumpRemoteConfig = {
+  machine: keyof typeof RemoteMachines;
   port: number;
   host: string;
   username: string;
@@ -20,6 +22,7 @@ export type JumpRemoteConfig = {
 };
 
 const createJumpRemote = async ({
+  machine,
   port,
   host,
   username,
@@ -80,7 +83,7 @@ const createJumpRemote = async ({
   });
 
   await clientPromise;
-  return new Remote(new RemoteClient(client, jumpHostClient));
+  return new Remote(new RemoteClient(client, jumpHostClient), machine);
 };
 
 export default createJumpRemote;

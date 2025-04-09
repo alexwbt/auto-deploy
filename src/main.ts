@@ -4,11 +4,11 @@ import initialize from "./core/initialize";
 import syncPackage from "./core/syncPackage";
 import testConnection from "./core/testConnection";
 import { getDomainInstance } from "./domain";
-import { RemoteConfig } from "./lib/remote/createRemote";
 import { JumpRemoteConfig } from "./lib/remote/createJumpRemote";
+import { RemoteConfig } from "./lib/remote/createRemote";
 import remoteSession from "./lib/remote/remoteSession";
 import packageEnvHook from "./lib/template/packageEnvHook";
-import { getEnv, getEnvNumber, getEnvStringRequired } from "./lib/utils/env";
+import { getEnv, getEnvNumber, getEnvString, getEnvStringRequired } from "./lib/utils/env";
 
 const args = arg({
   "--test": Boolean,
@@ -43,7 +43,7 @@ dotenv.config({ path: `./env/${args["--env"] || ""}.env` });
 //
 // Remote Configs
 //
-const remoteConfig = (): { jump: false } & RemoteConfig => ({
+const remoteConfig = (): { jump: false; } & RemoteConfig => ({
   jump: false,
   port: getEnvNumber("REMOTE_PORT", 22),
   host: getEnvStringRequired("REMOTE_HOST"),
@@ -53,9 +53,15 @@ const remoteConfig = (): { jump: false } & RemoteConfig => ({
   passphrase: getEnv('REMOTE_PRIVATE_KEY_PASSPHRASE'),
   httpProxyHost: getEnv('REMOTE_HTTP_PROXY_HOST'),
   httpProxyPort: getEnvNumber('REMOTE_HTTP_PROXY_PORT', 1080),
+  machine: (() => {
+    switch (getEnvString("REMOTE_MACHINE", "ec2")) {
+      case "ubuntu": return "ubuntu";
+      default: return "ec2";
+    }
+  })(),
 });
 
-const jumpRemoteConfig = (): { jump: true } & JumpRemoteConfig => ({
+const jumpRemoteConfig = (): { jump: true; } & JumpRemoteConfig => ({
   ...remoteConfig(),
   jump: true,
   jumpHost: getEnvStringRequired("JUMP_HOST"),
