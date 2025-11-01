@@ -2,13 +2,13 @@ import fs from "fs";
 
 const mergeDirs = require("merge-dirs");
 
-const packageEnvHook = async (domain: string, env: string, srcDir: string, targetDir: string) => {
-  const fromDir = `${targetDir}/${domain}/${srcDir}/${env}`;
-  if (!fs.existsSync(fromDir))
-    return;
+const packageEnvHook = async (env: string, srcDir: string, targetDir: string) => {
+  const fromDir = `${targetDir}/${srcDir}/${env}`;
 
-  mergeDirs.default(fromDir, `${targetDir}/${domain}`, "overwrite");
-  fs.rmSync(`${targetDir}/${domain}/${srcDir}`, { recursive: true, force: true });
+  if (fs.existsSync(fromDir))
+    mergeDirs.default(fromDir, `${targetDir}`, "overwrite");
+
+  fs.rmSync(`${targetDir}/${srcDir}`, { recursive: true, force: true });
 };
 
 export default packageEnvHook;

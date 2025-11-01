@@ -7,24 +7,28 @@ export type RenderDirectoryOptions = {
   srcDir: string;
   destDir: string;
   data?: object;
-  excludeRegex?: RegExp;
+  packageExcludeRegex?: RegExp;
+  templateExcludeRegex?: RegExp;
 };
 
 const renderDirectory = ({
   srcDir,
   destDir,
   data,
-  excludeRegex,
+  packageExcludeRegex,
+  templateExcludeRegex,
 }: RenderDirectoryOptions) => {
   return forEachFile(srcDir, async ({ filePath }) => {
     const relativeFilePath = path.relative(srcDir, filePath);
     const outputFilePath = path.join(destDir, relativeFilePath);
 
+    if (packageExcludeRegex?.test(relativeFilePath))
+      return;
+
     // create output directory
     await fs.promises.mkdir(path.dirname(outputFilePath), { recursive: true });
 
-    const exclude = excludeRegex?.test(relativeFilePath);
-    if (exclude) {
+    if (templateExcludeRegex?.test(relativeFilePath)) {
       // copy file directly
       await fs.promises.copyFile(filePath, outputFilePath);
     } else {

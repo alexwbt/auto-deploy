@@ -1,4 +1,13 @@
 
+## .env
+```
+.
+└── env/
+    ├── template.env
+    └── {package}.{env}.env
+```
+
+
 ## Usage
 ```
 node . [options]
@@ -6,30 +15,46 @@ node . [options]
 
 ## Options
 ```
+-d, --domain 
+  specify domain
+
+-e, --env
+  specify environment
+
 --test
   test connection
 
 --init
   initialize remote machine
 
+--package
+  build config
+
 --deploy
-    deploy config
+  build and deploy config
 
 --jump
-    use jump host
-
--d, --domain 
-    specify domain
-
--e, --env
-    specify environment
+  use jump host
 
 -m, --message
-    commit message
+  commit message
 ```
 
 
 ## Example
+
 ```
-node . --jump --deploy -d demo -e uat
+node . -d demo -e uat --test
+```
+
+```
+node . -d demo -e uat --init
+```
+
+```
+node . -d demo -e uat --deploy
+```
+
+```
+node . -d demo -e uat --package
 ```

@@ -1,7 +1,7 @@
-version: "3"
+
 services:
   auto-deploy:
-    image: node:18-alpine3.18
+    image: node:22-alpine3.21
     container_name: auto-deploy
     volumes:
       - .:/app

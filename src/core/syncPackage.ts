@@ -1,21 +1,14 @@
-import fs from "fs";
+import simpleGit from "simple-git";
 import Remote from "../lib/remote/Remote";
 import { RemoteExecResult } from "../lib/remote/RemoteClient";
-import renderDirectory from "../lib/template/renderDirectory";
-import buildEnvFile from "../lib/utils/buildEnvFile";
+import buildPackage, { PackageConfig } from "./buildPackage";
 
-export type SyncConfig = {
+export type SyncConfig = PackageConfig & {
   /**
    * Remote destination directory
-   * - default to "~/"
-   * - passing empty string will result to root directory "/"
+   * - default to "~/package"
    */
   dir?: string;
-
-  /**
-   * Package directory.
-   */
-  package?: string;
 
   /**
    * commit message.
@@ -26,22 +19,6 @@ export type SyncConfig = {
    * List of name to keep while sync package.
    */
   keep?: string[];
-
-  /**
-   * Runtime environment variables.
-   */
-  env?: { [key: string]: string; };
-
-  /**
-   * Template variables.
-   */
-  templateEnv?: { [key: string]: string; };
-  templateExcludeRegex?: RegExp;
-
-  /**
-   * Package hook, called after rendering package dir.
-   */
-  packageHook?: (packageDir: string) => Promise<void>;
 
   /**
    * Unpack hook, called after unpacking package on remote.
@@ -69,37 +46,27 @@ export type SyncConfig = {
   debug?: boolean;
 };
 
-const syncPackage = async (remote: Remote, domain: string, config: SyncConfig = {}) => {
-  const packageTmpDir = config.debug ? "dist" : "package_tmp";
-  const packageDir = config.package || "package";
+const syncPackage = async (remote: Remote, domain: string, config: SyncConfig) => {
+  // temporary directory for package on remote machine
+  const packageTmpDir = config.outputDir;
 
   // domain directory
   const packageDomainDir = `${packageTmpDir}/${domain}`;
-  const destDomainDir = `${config.dir || "~"}/${domain}`;
+  const destDomainDir = `${config.dir || "~/package"}`;
 
-  // env data
-  const envData = {
-    ...config.env,
-    "WORK_DIR": destDomainDir,
-  };
-
-  // render template
-  await renderDirectory({
-    srcDir: packageDir,
-    destDir: packageTmpDir,
-    data: config.templateEnv,
-    excludeRegex: config.templateExcludeRegex,
+  // build package
+  // override outputDir
+  await buildPackage({
+    ...config,
+    outputDir: config.debug
+      ? `dist/debug/${domain}_${Date.now()}`
+      : packageDomainDir,
   });
-  config.packageHook && await config.packageHook(packageTmpDir);
+
+  if (config.debug)
+    return;
 
   try {
-    // build env
-    const envResult = await buildEnvFile(`${packageDomainDir}/.env`, envData);
-    config.verbose && console.log(`-------\n.env\n-------\n${envResult}\n-------`);
-
-    if (config.debug)
-      return;
-
     // pre-upload checks
     const testRes = await remote.client
       .exec("test -d " + destDomainDir)
@@ -150,19 +117,27 @@ const syncPackage = async (remote: Remote, domain: string, config: SyncConfig = 
         console.warn("No Change Detected");
     }
 
+    // get local git info
+    const git = simpleGit();
+    const [user, email, log, diff] = await Promise.all([
+      git.getConfig("user.name"),
+      git.getConfig("user.email"),
+      git.log().then(res => res.latest?.hash || "-"),
+      git.diffSummary().then(res => res.files.map(f => "changes" in f ? `${f.file}(${f.changes})` : f.file).join("\n")),
+    ]);
+
     await remote.git.commit({
-      message: config.message || (init ? "initial commit" : "sync package"),
+      message: config.message || (init
+        ? "initial commit"
+        : `sync package\npackage: ${packageTmpDir}\ncommit: ${log}\ndiff:\n${diff}`),
       dir: destDomainDir,
-      author: config.author,
+      author: config.author || `${user.value} <${email.value}>`,
     }).catch(e => {
       console.warn("Failed To Commit:", e);
     });
   } catch (error) {
     console.error("Error thrown: ", error);
   }
-
-  // remove packageTmp
-  await fs.promises.rm(packageTmpDir, { recursive: true, force: true });
 
   console.log("Sync Package Complete");
 

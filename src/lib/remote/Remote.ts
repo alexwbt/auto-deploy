@@ -1,6 +1,5 @@
 import RemoteClient from "./RemoteClient";
 import RemoteMachines from "./software/machine";
-import RemoteEC2 from "./software/machine/RemoteEC2";
 import RemoteMachine from "./software/machine/RemoteMachine";
 import RemoteGit from "./software/RemoteGit";
 

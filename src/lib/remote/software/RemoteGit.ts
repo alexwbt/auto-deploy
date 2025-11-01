@@ -1,4 +1,3 @@
-import simpleGit from "simple-git";
 import { RemoteExecResult } from "../RemoteClient";
 import RemoteSoftware from "./RemoteSoftware";
 
@@ -47,18 +46,7 @@ export default class RemoteGit extends RemoteSoftware {
   }
 
   public async commit(option: GitOption = {}): Promise<RemoteExecResult> {
-    return await this.client.exec(this.gitCmd("commit", {
-      ...option,
-      author: option.author || await (async () => {
-        // get local git username and email
-        const git = simpleGit();
-        const [user, email] = await Promise.all([
-          git.getConfig("user.name"),
-          git.getConfig("user.email"),
-        ]);
-        return `${user.value} <${email.value}>`;
-      })(),
-    }));
+    return await this.client.exec(this.gitCmd("commit", option));
   }
 
 }
