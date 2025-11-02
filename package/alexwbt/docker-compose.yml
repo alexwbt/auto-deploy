@@ -34,7 +34,7 @@ services:
     restart: always
     volumes:
       - "${WORK_DIR}/runtime/code-activity-server/repositories:/app/repositories"
-      - "/root/.ssh/id_rsa:/root/.ssh/id_rsa:ro"
+      - "/root/.ssh:/root/.ssh"
 
   alexwbt-ui:
     restart: always
