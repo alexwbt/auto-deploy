@@ -44,5 +44,9 @@
   "javascript.format.placeOpenBraceOnNewLineForControlBlocks": false,
   "javascript.format.placeOpenBraceOnNewLineForFunctions": false,
   "javascript.format.semicolons": "insert",
-  "javascript.preferences.quoteStyle": "double"
+  "javascript.preferences.quoteStyle": "double",
+  "cSpell.words": [
+    "alexwbt",
+    "certbot"
+  ]
 }

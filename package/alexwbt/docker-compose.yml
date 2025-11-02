@@ -1,0 +1,43 @@
+
+services:
+
+  nginx-http:
+    image: nginx:1.25.4-alpine
+    container_name: nginx-http
+    restart: always
+    ports:
+      - 80:80
+    volumes:
+      - ${WORK_DIR}/config/nginx_http.conf:/etc/nginx/conf.d/nginx_http.conf:ro
+      - ${WORK_DIR}/runtime/certbot/www:/var/www/certbot/:ro
+
+  certbot:
+    image: certbot/certbot:v4.0.0
+    container_name: certbot
+    volumes:
+      - ${WORK_DIR}/runtime/certbot/www/:/var/www/certbot/:rw
+      - ${WORK_DIR}/runtime/certbot/conf/:/etc/letsencrypt/:rw
+
+  nginx:
+    image: nginx:1.25.4-alpine
+    container_name: nginx
+    restart: always
+    ports:
+      - 443:443
+    volumes:
+      - ${WORK_DIR}/config/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ${WORK_DIR}/runtime/certbot/conf/:/etc/nginx/ssl/:ro
+
+  code-activity-server:
+    image: code-activity-server:latest
+    container_name: code-activity-server
+    restart: always
+    volumes:
+      - "${WORK_DIR}/runtime/code-activity-server/repositories:/app/repositories"
+
+  alexwbt-ui:
+    restart: always
+    image: alexwbt-ui:latest
+    container_name: alexwbt-ui
+    volumes:
+      - "${WORK_DIR}/config/alexwbt-ui.js:/app/dist/config.js:ro"
