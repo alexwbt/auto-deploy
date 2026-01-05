@@ -35,6 +35,8 @@ services:
     volumes:
       - "${WORK_DIR}/runtime/code-activity-server/repositories:/app/repositories"
       - "/root/.ssh:/root/.ssh"
+    environment:
+      ACTIVITY_FILE_FILTER: "\\.(ts|tsx|js|jsx|java|cpp|hpp|c|h|fs|vs|txt|json|sh|py|dockerfile)$"
 
   alexwbt-ui:
     restart: always
