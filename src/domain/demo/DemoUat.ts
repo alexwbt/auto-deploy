@@ -3,7 +3,6 @@ import Remote from "../../lib/remote/Remote";
 import { EnvHandler } from "../Domain";
 
 export default class DemoUat implements EnvHandler<DemoEnv, DemoTemplateEnv> {
-
   public getRootDir(): string {
     return "~/demo-uat";
   }
@@ -20,14 +19,21 @@ export default class DemoUat implements EnvHandler<DemoEnv, DemoTemplateEnv> {
     };
   }
 
-  public async initialize(remote: Remote): Promise<void> { }
+  public async initialize(remote: Remote): Promise<void> {}
 
-  public async unpackHook(remote: Remote, targetDir: string): Promise<void> { }
+  public async unpackHook(
+    remote: Remote,
+    targetDir: string,
+    runtimeDir: string,
+  ): Promise<void> {}
 
-  public async completeHook(remote: Remote, targetDir: string): Promise<void> { }
+  public async completeHook(
+    remote: Remote,
+    targetDir: string,
+    runtimeDir: string,
+  ): Promise<void> {}
 
-  public async getTemplateExcludeRegex() { }
+  public async getTemplateExcludeRegex() {}
 
-  public async getPackageExcludeRegex() { }
-
+  public async getPackageExcludeRegex() {}
 }

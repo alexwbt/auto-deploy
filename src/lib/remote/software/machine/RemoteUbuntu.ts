@@ -1,12 +1,14 @@
+import { getEnvString } from "../../../utils/env";
 import RemoteClient, { RemoteExecResult } from "../../RemoteClient";
 import RemoteMachine, { Package } from "./RemoteMachine";
 
 export default class RemoteUbuntu extends RemoteMachine {
-
   constructor(protected readonly client: RemoteClient) {
     super(client);
     this.registerPackageInstaller("git", () => this.installGit());
     this.registerPackageInstaller("docker", () => this.installDocker());
+    this.registerPackageInstaller("minikube", () => this.installMinikube());
+    this.registerPackageInstaller("helm", () => this.installHelm());
   }
 
   public override updatePackages(): Promise<RemoteExecResult> {
@@ -18,9 +20,10 @@ export default class RemoteUbuntu extends RemoteMachine {
   }
 
   public installGit(): Promise<RemoteExecResult> {
+    const user = getEnvString("REMOTE_USER");
     return this.client.exec(`${this.sudo()} apt install git -y \
-      && git config --global user.name ubuntu \
-      && git config --global user.email ubuntu@localhost`);
+      && git config --global user.name ${user} \
+      && git config --global user.email ${user}@localhost`);
   }
 
   public installDocker(): Promise<RemoteExecResult> {
@@ -33,7 +36,20 @@ export default class RemoteUbuntu extends RemoteMachine {
       && apt update -y \
       && apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y \
       && groupadd -f docker \
-      && usermod -aG docker $(whoami)'`);
+      && usermod -aG docker ${getEnvString("REMOTE_USER")}'`);
   }
 
+  public installMinikube(): Promise<RemoteExecResult> {
+    return this.client.exec(
+      `curl -LO https://github.com/kubernetes/minikube/releases/latest/download/minikube-linux-amd64 \
+      && ${this.sudo()} install minikube-linux-amd64 /usr/local/bin/minikube \
+      && rm minikube-linux-amd64`,
+    );
+  }
+
+  public installHelm(): Promise<RemoteExecResult> {
+    return this.client.exec(
+      `curl https://raw.githubusercontent.com/helm/helm/HEAD/scripts/get-helm-3 | bash`,
+    );
+  }
 }

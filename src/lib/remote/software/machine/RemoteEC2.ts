@@ -2,7 +2,6 @@ import RemoteClient, { RemoteExecResult } from "../../RemoteClient";
 import RemoteMachine, { Package } from "./RemoteMachine";
 
 export default class RemoteEC2 extends RemoteMachine {
-
   constructor(protected readonly client: RemoteClient) {
     super(client);
     this.registerPackageInstaller("git", () => this.installGit());
@@ -32,5 +31,4 @@ export default class RemoteEC2 extends RemoteMachine {
       && curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose \
       && chmod +x /usr/local/bin/docker-compose'`);
   }
-
 }

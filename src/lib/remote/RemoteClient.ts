@@ -17,21 +17,20 @@ export type RemoteExecResult = {
 };
 
 export default class RemoteClient {
-
   constructor(
     private client: Client,
     private jumpClient?: Client,
-  ) { }
+  ) {}
 
   public end() {
     this.client.end();
-    if (this.jumpClient)
-      this.jumpClient.end();
+    if (this.jumpClient) this.jumpClient.end();
   }
 
-  public exec(command: string, {
-    on_stdout, on_stderr, on_data, on_error_data
-  }: RemoteExecConfig = {}) {
+  public exec(
+    command: string,
+    { on_stdout, on_stderr, on_data, on_error_data }: RemoteExecConfig = {},
+  ) {
     return new Promise<RemoteExecResult>((res, rej) => {
       let stdout = "";
       let stderr = "";
@@ -52,7 +51,7 @@ export default class RemoteClient {
         });
         stream.stderr.on("data", (data: Buffer) => {
           on_error_data && on_error_data(data);
-          on_stderr && on_stderr(`${data}`)
+          on_stderr && on_stderr(`${data}`);
           stderr += `${data}`;
         });
       });
@@ -81,7 +80,7 @@ export default class RemoteClient {
           }
           res(undefined);
         });
-      })
+      });
     });
 
     // rm tmp file
@@ -91,7 +90,8 @@ export default class RemoteClient {
     if (uploadError) throw uploadError;
 
     // move remove tmp to destination
-    return await this.exec(`mkdir -p ${dest} && tar -xvf ${file} --directory ${dest} && rm ${file}`);
+    return await this.exec(
+      `mkdir -p ${dest} && tar -xvf ${file} --directory ${dest} && rm ${file}`,
+    );
   }
-
 }

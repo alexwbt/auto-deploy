@@ -4,7 +4,6 @@ import RemoteMachine from "./software/machine/RemoteMachine";
 import RemoteGit from "./software/RemoteGit";
 
 export default class Remote {
-
   public readonly machine: RemoteMachine;
   public readonly git: RemoteGit;
 
@@ -15,5 +14,4 @@ export default class Remote {
     this.machine = new RemoteMachines[machine](client);
     this.git = new RemoteGit(client);
   }
-
 }

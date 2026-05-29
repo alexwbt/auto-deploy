@@ -20,12 +20,12 @@ export type PackageConfig = {
   /**
    * Runtime environment variables.
    */
-  env?: { [key: string]: string; };
+  env?: { [key: string]: string };
 
   /**
    * Template variables.
    */
-  templateEnv?: { [key: string]: string; };
+  templateEnv?: { [key: string]: string };
 
   /**
    * Regex to exclude files from the template rendering.
@@ -50,7 +50,7 @@ const buildPackage = async (config: PackageConfig) => {
     packageExcludeRegex: config.packageExcludeRegex,
     templateExcludeRegex: config.templateExcludeRegex,
   });
-  config.packageHook && await config.packageHook(config.outputDir);
+  config.packageHook && (await config.packageHook(config.outputDir));
 
   // build env
   await buildEnvFile(`${config.outputDir}/.env`, config.env || {});

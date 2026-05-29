@@ -1,9 +1,14 @@
-
 services:
   auto-deploy:
-    image: node:22-alpine3.21
+    build:
+      context: .
+      args:
+        COMMIT_HASH: ${COMMIT_HASH}
+    image: ivannglivelyimpact/auto-deploy:${TAG}
     container_name: auto-deploy
-    volumes:
-      - .:/app
     entrypoint: tail
     command: -f /dev/null
+    volumes:
+      - ./env:/app/env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

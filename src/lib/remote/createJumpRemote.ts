@@ -55,9 +55,9 @@ const createJumpRemote = async ({
 
   jumpHostClient.on("ready", () => {
     console.log("Jump host connection ready.");
-    jumpHostClient.forwardOut('127.0.0.1', 8000, host, 22, (error, stream) => {
+    jumpHostClient.forwardOut("127.0.0.1", 8000, host, 22, (error, stream) => {
       if (error) {
-        console.log('Jump Host exec error: ' + error);
+        console.log("Jump Host exec error: " + error);
         return jumpHostClient.end();
       }
 

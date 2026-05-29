@@ -1,4 +1,3 @@
-
 export type DemoEnv = {
   DEMO_ENV_VARIABLE: string;
 };
