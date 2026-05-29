@@ -8,8 +8,8 @@ const DOMAIN_INSTANCES = {
     uat: new DemoUat(),
     prod: new DemoProd(),
   }),
-  "alexwbt": new Domain({
-    "prod": new AlexwbtProd(),
+  alexwbt: new Domain({
+    prod: new AlexwbtProd(),
   }),
 } as {
   readonly [domain: string]: Domain<any, any> | undefined;
