@@ -10,12 +10,17 @@ const Packages = [
   "vim",
   "htop",
   "tmux",
+  "tree",
+  "minikube",
+  "helm",
+  "unzip",
 ] as const;
-export type Package = typeof Packages[number];
+export type Package = (typeof Packages)[number];
 
 export default abstract class RemoteMachine extends RemoteSoftware {
-
-  protected packageInstallers: { [key in Package]?: () => Promise<RemoteExecResult> } = {};
+  protected packageInstallers: {
+    [key in Package]?: () => Promise<RemoteExecResult>;
+  } = {};
 
   protected registerPackageInstaller(
     packageName: Package,
@@ -33,9 +38,17 @@ export default abstract class RemoteMachine extends RemoteSoftware {
 
   public abstract _install(packageName: Package): Promise<RemoteExecResult>;
 
-  public install(packageName: Package): Promise<RemoteExecResult> {
+  public async install(packageName: Package): Promise<RemoteExecResult> {
+    console.log(`installing "${packageName}"...`);
     const installer = this.packageInstallers[packageName];
-    return installer ? installer() : this._install(packageName);
-  }
 
+    try {
+      const res = await (installer ? installer() : this._install(packageName));
+      console.log(`installed "${packageName}"`);
+      return res;
+    } catch (e) {
+      console.error(`failed to install "${packageName}"`, e);
+      throw e;
+    }
+  }
 }

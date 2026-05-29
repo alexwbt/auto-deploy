@@ -18,27 +18,31 @@ const renderDirectory = ({
   packageExcludeRegex,
   templateExcludeRegex,
 }: RenderDirectoryOptions) => {
-  return forEachFile(srcDir, async ({ filePath }) => {
-    const relativeFilePath = path.relative(srcDir, filePath);
-    const outputFilePath = path.join(destDir, relativeFilePath);
+  return forEachFile(
+    srcDir,
+    async ({ filePath }) => {
+      const relativeFilePath = path.relative(srcDir, filePath);
+      const outputFilePath = path.join(destDir, relativeFilePath);
 
-    if (packageExcludeRegex?.test(relativeFilePath))
-      return;
+      if (packageExcludeRegex?.test(relativeFilePath)) return;
 
-    // create output directory
-    await fs.promises.mkdir(path.dirname(outputFilePath), { recursive: true });
+      // create output directory
+      await fs.promises.mkdir(path.dirname(outputFilePath), {
+        recursive: true,
+      });
 
-    if (templateExcludeRegex?.test(relativeFilePath)) {
-      // copy file directly
-      await fs.promises.copyFile(filePath, outputFilePath);
-    } else {
-      // process files with handlebars
-      const fileData = await fs.promises.readFile(filePath);
-      const result = handlebars.compile(fileData.toString())(data || {});
-      await fs.promises.writeFile(outputFilePath, result);
-    }
-
-  }, { recursive: true });
+      if (templateExcludeRegex?.test(relativeFilePath)) {
+        // copy file directly
+        await fs.promises.copyFile(filePath, outputFilePath);
+      } else {
+        // process files with handlebars
+        const fileData = await fs.promises.readFile(filePath);
+        const result = handlebars.compile(fileData.toString())(data || {});
+        await fs.promises.writeFile(outputFilePath, result);
+      }
+    },
+    { recursive: true },
+  );
 };
 
 export default renderDirectory;

@@ -46,7 +46,11 @@ export type SyncConfig = PackageConfig & {
   debug?: boolean;
 };
 
-const syncPackage = async (remote: Remote, domain: string, config: SyncConfig) => {
+const syncPackage = async (
+  remote: Remote,
+  domain: string,
+  config: SyncConfig,
+) => {
   // temporary directory for package on remote machine
   const packageTmpDir = config.outputDir;
 
@@ -63,8 +67,7 @@ const syncPackage = async (remote: Remote, domain: string, config: SyncConfig) =
       : packageDomainDir,
   });
 
-  if (config.debug)
-    return;
+  if (config.debug) return;
 
   try {
     // pre-upload checks
@@ -79,29 +82,36 @@ const syncPackage = async (remote: Remote, domain: string, config: SyncConfig) =
       const diffRes = await remote.git.diffHead({ dir: destDomainDir });
       if (diffRes.stdout) {
         config.verbose && console.log(diffRes.stdout);
-        throw new Error("Failed to sync package, "
-          + "uncommitted changes exist on remote.");
+        throw new Error(
+          "Failed to sync package, uncommitted changes exist on remote.",
+        );
       }
 
       // clean
-      await remote.client.exec(`find ${destDomainDir} `
-        + `-mindepth 1 -maxdepth 1 `
-        + [...(config.keep || []), ".git"].map(e => `! -iname "${e}" `).join(" ")
-        + `-exec rm -rf {} +`);
+      const keeps = [...(config.keep || []), ".git"]
+        .map(e => `! -iname "${e}" `)
+        .join(" ");
+      await remote.client.exec(
+        `find ${destDomainDir} -mindepth 1 -maxdepth 1 ${keeps}-exec rm -rf {} +`,
+      );
     }
 
     // upload
     await remote.client.upload(destDomainDir, packageDomainDir);
 
     // unpack
-    await remote.client.exec(`cp -rfu -t ${destDomainDir} `
-      + `${destDomainDir}/${packageDomainDir}/* `
-      + `${destDomainDir}/${packageDomainDir}/.[^.]*`);
+    await remote.client.exec(
+      `cp -rfu -t ${destDomainDir} ` +
+        `${destDomainDir}/${packageDomainDir}/* ` +
+        `${destDomainDir}/${packageDomainDir}/.[^.]*`,
+    );
     await remote.client.exec(`rm -rf ${destDomainDir}/${packageTmpDir}`);
     // unpack hook
-    config.unpackHook && await config.unpackHook(destDomainDir)
-      .then(() => console.log("Ran unpack hook"))
-      .catch(e => console.error("Unpack hook failed", e));
+    config.unpackHook &&
+      (await config
+        .unpackHook(destDomainDir)
+        .then(() => console.log("Ran unpack hook"))
+        .catch(e => console.error("Unpack hook failed", e)));
 
     // commit
     if (init) {
@@ -111,10 +121,8 @@ const syncPackage = async (remote: Remote, domain: string, config: SyncConfig) =
 
     if (!init) {
       const diffRes = await remote.git.diffHead({ dir: destDomainDir });
-      if (diffRes.stdout)
-        config.verbose && console.log(diffRes.stdout);
-      else
-        console.warn("No Change Detected");
+      if (diffRes.stdout) config.verbose && console.log(diffRes.stdout);
+      else console.warn("No Change Detected");
     }
 
     // get local git info
@@ -123,27 +131,39 @@ const syncPackage = async (remote: Remote, domain: string, config: SyncConfig) =
       git.getConfig("user.name"),
       git.getConfig("user.email"),
       git.log().then(res => res.latest?.hash || "-"),
-      git.diffSummary().then(res => res.files.map(f => "changes" in f ? `${f.file}(${f.changes})` : f.file).join("\n")),
+      git
+        .diffSummary()
+        .then(res =>
+          res.files
+            .map(f => ("changes" in f ? `${f.file}(${f.changes})` : f.file))
+            .join("\n"),
+        ),
     ]);
 
-    await remote.git.commit({
-      message: config.message || (init
-        ? "initial commit"
-        : `sync package\npackage: ${packageTmpDir}\ncommit: ${log}\ndiff:\n${diff}`),
-      dir: destDomainDir,
-      author: config.author || `${user.value} <${email.value}>`,
-    }).catch(e => {
-      console.warn("Failed To Commit:", e);
-    });
+    await remote.git
+      .commit({
+        message:
+          config.message ||
+          (init
+            ? "initial commit"
+            : `sync package\npackage: ${packageTmpDir}\ncommit: ${log}\ndiff:\n${diff}`),
+        dir: destDomainDir,
+        author: config.author || `${user.value} <${email.value}>`,
+      })
+      .catch(e => {
+        console.warn("Failed To Commit:", e);
+      });
   } catch (error) {
     console.error("Error thrown: ", error);
   }
 
   console.log("Sync Package Complete");
 
-  config.completeHook && await config.completeHook(destDomainDir)
-    .then(() => console.log("Ran complete hook"))
-    .catch(e => console.error("Complete hook failed", e));
+  config.completeHook &&
+    (await config
+      .completeHook(destDomainDir)
+      .then(() => console.log("Ran complete hook"))
+      .catch(e => console.error("Complete hook failed", e)));
 };
 
 export default syncPackage;

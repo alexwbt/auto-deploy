@@ -1,5 +1,5 @@
-
 ## .env
+
 ```
 .
 └── env/
@@ -7,15 +7,16 @@
     └── {package}.{env}.env
 ```
 
-
 ## Usage
+
 ```
 node . [options]
 ```
 
 ## Options
+
 ```
--d, --domain 
+-d, --domain
   specify domain
 
 -e, --env
@@ -39,7 +40,6 @@ node . [options]
 -m, --message
   commit message
 ```
-
 
 ## Example
 

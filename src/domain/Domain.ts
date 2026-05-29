@@ -8,20 +8,28 @@ export interface EnvHandler<EnvType, TemplateEnvType> {
   getPackageExcludeRegex(): Promise<RegExp> | Promise<void>;
 
   initialize(remote: Remote): Promise<void>;
-  unpackHook(remote: Remote, targetDir: string): Promise<void>;
-  completeHook(remote: Remote, targetDir: string): Promise<void>;
+  unpackHook(
+    remote: Remote,
+    targetDir: string,
+    runtimeDir: string,
+  ): Promise<void>;
+  completeHook(
+    remote: Remote,
+    targetDir: string,
+    runtimeDir: string,
+  ): Promise<void>;
 }
 
 export default class Domain<EnvType, TemplateEnvType> {
-
   constructor(
-    private envs: { [env: string]: EnvHandler<EnvType, TemplateEnvType> | undefined; },
-  ) { }
+    private envs: {
+      [env: string]: EnvHandler<EnvType, TemplateEnvType> | undefined;
+    },
+  ) {}
 
   private getEnv(env: string): EnvHandler<EnvType, TemplateEnvType> {
     const handler = this.envs[env];
-    if (!handler)
-      throw new Error("invalid env");
+    if (!handler) throw new Error("invalid env");
     return handler;
   }
 
@@ -49,12 +57,21 @@ export default class Domain<EnvType, TemplateEnvType> {
     return this.getEnv(env).initialize(remote);
   }
 
-  public unpackHook(env: string, remote: Remote, targetDir: string): Promise<void> {
-    return this.getEnv(env).unpackHook(remote, targetDir);
+  public unpackHook(
+    env: string,
+    remote: Remote,
+    targetDir: string,
+    runtimeDir: string,
+  ): Promise<void> {
+    return this.getEnv(env).unpackHook(remote, targetDir, runtimeDir);
   }
 
-  public completeHook(env: string, remote: Remote, targetDir: string): Promise<void> {
-    return this.getEnv(env).completeHook(remote, targetDir);
+  public completeHook(
+    env: string,
+    remote: Remote,
+    targetDir: string,
+    runtimeDir: string,
+  ): Promise<void> {
+    return this.getEnv(env).completeHook(remote, targetDir, runtimeDir);
   }
-
 }

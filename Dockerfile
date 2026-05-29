@@ -18,3 +18,7 @@ COPY src ./src
 
 COPY .gitignore .
 RUN git init && git add . && git commit -m "initial commit"
+
+ARG COMMIT_HASH
+ENV COMMIT_HASH=$COMMIT_HASH
+LABEL commit_hash=$COMMIT_HASH

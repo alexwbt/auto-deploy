@@ -2,7 +2,11 @@ import fs from "fs";
 
 const mergeDirs = require("merge-dirs");
 
-const packageEnvHook = async (env: string, srcDir: string, targetDir: string) => {
+const packageEnvHook = async (
+  env: string,
+  srcDir: string,
+  targetDir: string,
+) => {
   const fromDir = `${targetDir}/${srcDir}/${env}`;
 
   if (fs.existsSync(fromDir))

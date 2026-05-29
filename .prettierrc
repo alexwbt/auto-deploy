@@ -1,0 +1,4 @@
+{
+  "arrowParens": "avoid",
+  "plugins": ["prettier-plugin-organize-imports"]
+}

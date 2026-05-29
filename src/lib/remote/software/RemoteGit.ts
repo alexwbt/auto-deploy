@@ -8,18 +8,19 @@ export type GitOption = {
 };
 
 export default class RemoteGit extends RemoteSoftware {
-
   private gitCmd(cmd: string, option: GitOption) {
     // git option
-    const gitOptionStr = [
-      option.dir && `-C ${option.dir}`,
-    ].filter(o => o).join(" ");
+    const gitOptionStr = [option.dir && `-C ${option.dir}`]
+      .filter(o => o)
+      .join(" ");
 
     // cmd option
     const cmdOptionStr = [
       option.message && `-m "${option.message}"`,
       option.author && `--author="${option.author}"`,
-    ].filter(o => o).join(" ");
+    ]
+      .filter(o => o)
+      .join(" ");
 
     return ["git", gitOptionStr, cmd, cmdOptionStr].join(" ");
   }
@@ -38,7 +39,9 @@ export default class RemoteGit extends RemoteSoftware {
   }
 
   public diffHead(option: GitOption = {}): Promise<RemoteExecResult> {
-    return this.client.exec(this.gitCmd("add -N .", option) + " && " + this.gitCmd("diff HEAD", option));
+    return this.client.exec(
+      `${this.gitCmd("add -N .", option)} && ${this.gitCmd("diff HEAD", option)}`,
+    );
   }
 
   public addAll(option: GitOption = {}): Promise<RemoteExecResult> {
@@ -48,5 +51,4 @@ export default class RemoteGit extends RemoteSoftware {
   public async commit(option: GitOption = {}): Promise<RemoteExecResult> {
     return await this.client.exec(this.gitCmd("commit", option));
   }
-
 }
