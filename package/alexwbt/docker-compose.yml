@@ -44,3 +44,31 @@ services:
     container_name: alexwbt-ui
     volumes:
       - "${WORK_DIR}/config/alexwbt-ui.js:/app/dist/config.js:ro"
+
+  hermes:
+    restart: always
+    image: nousresearch/hermes-agent:latest
+    container_name: hermes
+    environment:
+      - HERMES_DASHBOARD=1
+      - HERMES_DASHBOARD_INSECURE=1
+    volumes:
+      - ${RUNTIME_DIR}/hermes/data:/opt/data
+      - /root/workspace:/workspace
+    command: gateway run
+
+  tunnel:
+    restart: always
+    image: lscr.io/linuxserver/openssh-server:amd64-10.2_p1-r0-ls217
+    container_name: tunnel
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Etc/UTC
+      SUDO_ACCESS: false
+      USER_NAME: user
+    ports:
+      - 2222:2222
+    volumes:
+      - ${WORK_DIR}/config/tunnel/sshd_config:/config/sshd/sshd_config
+      - ${WORK_DIR}/config/tunnel/authorized_keys:/config/.ssh/authorized_keys
