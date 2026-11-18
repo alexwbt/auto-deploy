@@ -1,8 +1,8 @@
 import fs from "fs";
 import { Client } from "ssh2";
+import RemoteMachines from "./machine";
 import Remote from "./Remote";
 import RemoteClient from "./RemoteClient";
-import RemoteMachines from "./software/machine";
 
 export type JumpRemoteConfig = {
   machine: keyof typeof RemoteMachines;

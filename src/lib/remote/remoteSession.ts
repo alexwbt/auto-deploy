@@ -8,7 +8,11 @@ const remoteSession = async (
     | ({ jump: false } & RemoteConfig),
   run: (remote: Remote) => Promise<void>,
 ) => {
-  console.log("connecting...");
+  console.log(
+    `connecting to "${config.host}:${config.port}"${
+      config.jump ? ` from "${config.jumpHost}:${config.jumpHostPort}"` : ""
+    }`,
+  );
   const remote = await (config.jump
     ? createJumpRemote(config)
     : createRemote(config));
