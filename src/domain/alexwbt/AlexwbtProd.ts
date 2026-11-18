@@ -34,11 +34,11 @@ export default class AlexwbtProd implements EnvHandler<AxEnv, AxTemplateEnv> {
     );
   }
 
-  public async initialize(remote: Remote): Promise<void> {}
+  public async initialize(_remote: Remote): Promise<void> {}
 
   public async completeHook(
-    remote: Remote,
-    targetDir: string,
-    runtimeDir: string,
+    _remote: Remote,
+    _targetDir: string,
+    _runtimeDir: string,
   ): Promise<void> {}
 }
