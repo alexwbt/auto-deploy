@@ -1,4 +1,4 @@
-import RemoteClient, { RemoteExecResult } from "../../RemoteClient";
+import RemoteClient, { RemoteExecResult } from "../RemoteClient";
 import RemoteMachine, { Package } from "./RemoteMachine";
 
 export default class RemoteEC2 extends RemoteMachine {

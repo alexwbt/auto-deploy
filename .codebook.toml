@@ -1,0 +1,13 @@
+words = [
+    "expandtab",
+    "isdirectory",
+    "mkdir",
+    "netrw",
+    "nnoremap",
+    "relativenumber",
+    "scrolloff",
+    "sidescrolloff",
+    "tabstop",
+    "undodir",
+    "undofile",
+]

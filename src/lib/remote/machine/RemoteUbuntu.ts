@@ -1,5 +1,5 @@
-import { getEnvString } from "../../../utils/env";
-import RemoteClient, { RemoteExecResult } from "../../RemoteClient";
+import { getEnvString } from "../../utils/env";
+import RemoteClient, { RemoteExecResult } from "../RemoteClient";
 import RemoteMachine, { Package } from "./RemoteMachine";
 
 export default class RemoteUbuntu extends RemoteMachine {

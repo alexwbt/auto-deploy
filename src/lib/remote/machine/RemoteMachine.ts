@@ -1,6 +1,5 @@
-import { getEnvString } from "../../../utils/env";
-import { RemoteExecResult } from "../../RemoteClient";
-import RemoteSoftware from "../RemoteSoftware";
+import { getEnvString } from "../../utils/env";
+import RemoteClient, { RemoteExecResult } from "../RemoteClient";
 
 const Packages = [
   "git",
@@ -17,10 +16,13 @@ const Packages = [
 ] as const;
 export type Package = (typeof Packages)[number];
 
-export default abstract class RemoteMachine extends RemoteSoftware {
-  protected packageInstallers: {
-    [key in Package]?: () => Promise<RemoteExecResult>;
-  } = {};
+export default abstract class RemoteMachine {
+  constructor(
+    protected readonly client: RemoteClient,
+    protected packageInstallers: {
+      [key in Package]?: () => Promise<RemoteExecResult>;
+    } = {},
+  ) {}
 
   protected registerPackageInstaller(
     packageName: Package,
@@ -38,7 +40,20 @@ export default abstract class RemoteMachine extends RemoteSoftware {
 
   public abstract _install(packageName: Package): Promise<RemoteExecResult>;
 
-  public async install(packageName: Package): Promise<RemoteExecResult> {
+  public async install(
+    packageName: Package,
+    ignoreExisting?: boolean,
+  ): Promise<RemoteExecResult> {
+    if (!ignoreExisting) {
+      const existsRes = await this.client
+        .exec(`command -v "${packageName}"`)
+        .catch(e => e);
+      if (existsRes.code === 0 || !!existsRes.stdout) {
+        console.log(`skipping "${packageName}" (already installed)`);
+        return existsRes;
+      }
+    }
+
     console.log(`installing "${packageName}"...`);
     const installer = this.packageInstallers[packageName];
 
