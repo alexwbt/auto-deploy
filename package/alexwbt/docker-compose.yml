@@ -52,6 +52,8 @@ services:
     environment:
       - HERMES_DASHBOARD=1
       - HERMES_DASHBOARD_INSECURE=1
+      - HERMES_DASHBOARD_BASIC_AUTH_USERNAME=admin
+      - HERMES_DASHBOARD_BASIC_AUTH_PASSWORD=Hermes3214
     volumes:
       - ${RUNTIME_DIR}/hermes/data:/opt/data
       - /root/workspace:/workspace
